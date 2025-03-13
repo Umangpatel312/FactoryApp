@@ -1,0 +1,16 @@
+{
+  "user": {},
+  "task": {
+    "allComplete": "Toutes vos tâches sont terminées!",
+    "errors": {
+      "fetchingList": "Un problème est survenu lors de la récupération de vos tâches."
+    },
+    "markComplete": "Marquez-le comme terminé",
+    "markIncomplete": "Marquez-le comme incomplet",
+    "markedComplete": "Tâche marquée terminée",
+    "markedIncomplete": "Tâche marquée incomplète",
+    "tasks": "tâches",
+    "toComplete_one": "Vous avez {{count}} tâche à accomplir.",
+    "toComplete_other": "Vous avez {{count}} tâches à accomplir."
+  }
+}

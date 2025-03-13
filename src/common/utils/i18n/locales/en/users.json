@@ -1,0 +1,16 @@
+{
+  "user": {},
+  "task": {
+    "allComplete": "All your tasks are complete!",
+    "errors": {
+      "fetchingList": "A problem occurred fetching your tasks."
+    },
+    "markComplete": "Mark complete",
+    "markIncomplete": "Mark incomplete",
+    "markedComplete": "Marked task complete",
+    "markedIncomplete": "Marked task incomplete",
+    "tasks": "tasks",
+    "toComplete_one": "You have {{count}} task to complete.",
+    "toComplete_other": "You have {{count}} tasks to complete."
+  }
+}
