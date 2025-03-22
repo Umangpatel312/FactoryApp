@@ -49,7 +49,7 @@ function App(): JSX.Element {
                   </AxiosContextProvider>
                 </AuthContextProvider>
               </Theme>
-              {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+              <ReactQueryDevtools initialIsOpen={false} />
             </SettingsContextProvider>
           </QueryClientProvider>
         </ConfigContextProvider>

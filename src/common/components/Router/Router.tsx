@@ -27,6 +27,7 @@ import MachineDetailLayout from 'pages/MachinesPage/components/MachineDetailLayo
 import MachineForm from 'pages/MachinesPage/components/MachineForm';
 import EmployeesPage from 'pages/EmployeesPage/EmployeesPage';
 import EmployeeDetailEmpty from 'pages/EmployeesPage/components/EmployeeDetailEmpty';
+import SignupPage from 'pages/SignupPage/SignupPage';
 
 /**
  * The React Router configuration. An array of `RouteObject`.
@@ -45,6 +46,10 @@ export const routes: RouteObject[] = [
       {
         path: 'auth/signin',
         element: <SigninPage />,
+      },
+      {
+        path: 'auth/signup',
+        element: <SignupPage />,
       },
       {
         path: 'auth/signout',

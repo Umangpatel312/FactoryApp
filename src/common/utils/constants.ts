@@ -9,7 +9,8 @@ export enum QueryKeys {
   Users = 'Users',
   UserTokens = 'UserTokens',
   Machines = 'Machines',
-  Employees = 'Employees'
+  Employees = 'Employees',
+  UserRoles = 'UserRoles'
 }
 
 /**
@@ -20,7 +21,7 @@ export enum StorageKeys {
   Settings = 'react-starter.settings',
   User = 'react-starter.user',
   UserTokens = 'react-starter.user-tokens',
-  Machines = 'ract-starter.machine'
+  UserRoles = 'react-start.user-roles'
 }
 
 /**

@@ -23,6 +23,8 @@ export const useSignout = () => {
       try {
         storage.removeItem(StorageKeys.UserTokens);
         storage.removeItem(StorageKeys.User);
+        storage.removeItem(StorageKeys.Language);
+        storage.removeItem(StorageKeys.UserRoles);
         resolve();
       } catch (err) {
         reject(err);

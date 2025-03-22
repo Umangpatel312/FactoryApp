@@ -1,5 +1,5 @@
 import { useAuth } from 'common/hooks/useAuth';
-import { useGetCurrentUser } from 'common/api/useGetCurrentUser';
+import { useGetCurrentUser } from 'common/api/useGetUserRoles';
 
 import logo from './logo.png';
 import SideMenu, { SideMenuProps } from 'common/components/Menu/SideMenu/SideMenu';

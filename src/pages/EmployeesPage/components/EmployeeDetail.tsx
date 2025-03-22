@@ -12,14 +12,14 @@ import UserTasks from './UserTasks';
  * @see {@link PropsWithClassName}
  * @see {@link PropsWithTestId}
  */
-interface UserDetailProps extends PropsWithClassName, PropsWithTestId {}
+interface EmployeeDetailProps extends PropsWithClassName, PropsWithTestId { }
 
 /**
  * The `UserDetail` component renders the detailed attributes of a `User` object.
  * @param {UserDetailLayoutProps} props - Component properties.
  * @returns {JSX.Element} JSX
  */
-const UserDetail = ({ className, testId = 'user-detail' }: UserDetailProps): JSX.Element => {
+const UserDetail = ({ className, testId = 'user-detail' }: EmployeeDetailProps): JSX.Element => {
   const { userId } = useParams();
   const { data: user, error, isPending } = useGetUser({ userId: Number(userId) });
 

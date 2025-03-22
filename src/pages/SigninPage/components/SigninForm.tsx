@@ -3,19 +3,20 @@ import classNames from 'classnames';
 import { Alert, AlertVariant, PropsWithClassName, PropsWithTestId } from '@leanstacks/react-common';
 import { Form, Formik } from 'formik';
 import { object, string } from 'yup';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Button } from '@leanstacks/react-common';
 
 import { useSignin } from '../api/useSignin';
 import TextField from 'common/components/Form/TextField';
 import FAIcon from 'common/components/Icon/FAIcon';
+import Text from 'common/components/Text/Text';
 
 /**
  * Properties for the `SigninForm` component.
  * @see {@link PropsWithClassName}
  * @see {@link PropsWithTestId}
  */
-interface SigninFormProps extends PropsWithClassName, PropsWithTestId {}
+interface SigninFormProps extends PropsWithClassName, PropsWithTestId { }
 
 /**
  * Signin form values.
@@ -30,11 +31,11 @@ interface SigninFormValues {
  */
 const validationSchema = object<SigninFormValues>({
   password: string()
-    .matches(/[0-9]/, 'Must have a number. ')
-    .matches(/[a-z]/, 'Must have a lowercase letter. ')
-    .matches(/[A-Z]/, 'Must have an uppercase letter. ')
-    .matches(/[$*.[{}()?"!@#%&/,><':;|_~`^\]\\]/, 'Must have a special character. ')
-    .min(12, 'Must have at least 12 characters. ')
+    // .matches(/[0-9]/, 'Must have a number. ')
+    // .matches(/[a-z]/, 'Must have a lowercase letter. ')
+    // .matches(/[A-Z]/, 'Must have an uppercase letter. ')
+    // .matches(/[$*.[{}()?"!@#%&/,><':;|_~`^\]\\]/, 'Must have a special character. ')
+    // .min(12, 'Must have at least 12 characters. ')
     .required('Required. '),
   username: string().required('Required.'),
 });
@@ -72,8 +73,12 @@ const SigninForm = ({ className, testId = 'form-signin' }: SigninFormProps): JSX
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {
           setError('');
-          signin(values.username, {
+          signin({
+            userIdentification: values.username,
+            password: values.password
+          }, {
             onSuccess: () => {
+              console.log("Logged in")
               setSubmitting(false);
               navigate('/');
             },
@@ -105,14 +110,20 @@ const SigninForm = ({ className, testId = 'form-signin' }: SigninFormProps): JSX
               disabled={isSubmitting}
               testId={`${testId}-text-field-password`}
             />
-            <Button
-              type="submit"
-              className="w-full sm:w-40"
-              disabled={isSubmitting || !dirty}
-              testId={`${testId}-button-submit`}
-            >
-              Sign In
-            </Button>
+            <div className='flex'>
+              <Button
+                type="submit"
+                className="w-full sm:w-40"
+                disabled={isSubmitting || !dirty}
+                testId={`${testId}-button-submit`}
+              >
+                Sign In
+              </Button>
+              <Text className='mt-2'>Dont have an account yet?
+                <NavLink to="/auth/signup" className="ml-2 text-blue-500 decoration-blue-500 underline hover:text-blue-700 hover:decoration-blue-700">Sign Up</NavLink>
+              </Text>
+            </div>
+
           </Form>
         )}
       </Formik>

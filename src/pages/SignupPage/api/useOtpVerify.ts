@@ -1,47 +1,30 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import dayjs from 'dayjs';
-import find from 'lodash/find';
-
-import { User } from 'common/api/useGetUser';
 import { UserTokens } from 'common/api/useGetUserTokens';
+
 import { useAxios } from 'common/hooks/useAxios';
 import { useConfig } from 'common/hooks/useConfig';
-import storage from 'common/utils/storage';
 import { QueryKeys, StorageKeys } from 'common/utils/constants';
-import { useUserRoles } from './useUserRole';
-import { getJwtClaims } from './getJwtClaims';
+import storage from 'common/utils/storage';
+import { getJwtClaims } from 'pages/SigninPage/api/getJwtClaims';
+import { SignInResponsePayload } from 'pages/SigninPage/api/useSignin';
+
 
 /**
  * The `useDeleteTask` mutation function variables.
  */
-export type SignInReqestPayload = {
-  userIdentification: string;
-  password: string
+export type OtpVerifyReqestPayload = {
+  userId: number;
+  otp: string
 };
-
-export type SignInResponsePayloadData = {
-  user: User;
-  token: string;
-  expires_in: number;
-  expires_at: string;
-}
-
-export type SignInResponsePayload = {
-  data: SignInResponsePayloadData;
-  message: string;
-}
 
 /**
  * An API hook which performs user authentication.
  * @returns Returns a `UseMutationResult` with `User` data.
  */
-
-export const useSignin = () => {
-  const queryClient = useQueryClient();
+export const useOTPVerify = () => {
   const axios = useAxios();
   const config = useConfig();
-
-  const { fetchAndCacheUserRoles } = useUserRoles();   // ✅ Use the hook
+  const queryClient = useQueryClient();
 
 
   /**
@@ -50,26 +33,19 @@ export const useSignin = () => {
    * @returns Returns a Promise which resolves to a `User` if successful,
    * otherwise throws an Error.
    */
-
-  const signin = async (signInRequestPayload: SignInReqestPayload): Promise<User> => {
-    // REPLACE: This is a contrived "signin" approach for demonstration purposes.
-    //          You should implement authentication functionality in accordance
-    //          with your IdP.
-
+  const otpVerify = async (otpVerifyReqestPayload: OtpVerifyReqestPayload): Promise<string> => {
+    console.log(otpVerifyReqestPayload);
     // fetch all users
-    // TODO: login api changes
     const response = await axios.request<SignInResponsePayload>({
-      url: `${config.VITE_BASE_URL_API}/auth/login`,
+      url: `${config.VITE_BASE_URL_API}/v1/users/verify-otp`,
       method: 'post',
-      data: signInRequestPayload
+      data: otpVerifyReqestPayload
     });
     console.log(response);
-    // if user matching 'username' is found, consider the user to be authenticated.
-    const data = response.data.data;
-    console.log(data.user);
-
-    if (data) {
+    if (response.data.message === 'User is verified successfully!') {
       // store current user in localstorage
+      const data = response.data.data;
+
       storage.setItem(StorageKeys.User, JSON.stringify(data.user));
 
       // simlate the creation of authentication tokens
@@ -88,22 +64,18 @@ export const useSignin = () => {
 
       storage.setItem(StorageKeys.UserRoles, JSON.stringify(decodedClaims?.roles));
 
-      return data.user;
+      return response.data.message;
     } else {
-      throw new Error('Authentication failed.');
+      console.error(response.data.message);
+      throw new Error('OTP verification failed');
     }
   };
 
   return useMutation({
-    mutationFn: signin,
-    onSuccess: async () => {
+    mutationFn: otpVerify,
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.UserTokens] });
       queryClient.invalidateQueries({ queryKey: [QueryKeys.Users, 'current'] });
-
-      // await fetchAndCacheUserRoles();
-      // queryClient.setQueryData([QueryKeys.UserRoles], roles);
-      // storage.setItem(StorageKeys.UserRoles, JSON.stringify(roles));
-
     },
   });
 };

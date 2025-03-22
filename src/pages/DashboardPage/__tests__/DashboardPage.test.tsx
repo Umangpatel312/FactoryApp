@@ -4,7 +4,7 @@ import { UseQueryResult } from '@tanstack/react-query';
 
 import { User } from 'common/api/useGetUser';
 import { userFixture1 } from '__fixtures__/users';
-import * as UseGetCurrentUser from 'common/api/useGetCurrentUser';
+import * as UseGetCurrentUser from 'common/api/useGetUserRoles';
 
 import DashboardPage from '../DashboardPage';
 

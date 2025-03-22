@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { useGetCurrentUser } from 'common/api/useGetCurrentUser';
+import { useGetCurrentUser } from 'common/api/useGetUserRoles';
 import LoaderSkeleton from 'common/components/Loader/LoaderSkeleton';
 import Page from 'common/components/Page/Page';
 import UserTasksCard from 'pages/UsersPage/components/UserTasksCard';

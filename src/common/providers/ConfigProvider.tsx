@@ -8,7 +8,9 @@ import { Config, ConfigContext } from './ConfigContext';
  * @see {@link https://github.com/jquense/yup | Yup}
  */
 const configSchema: ObjectSchema<Config> = object({
-  VITE_BASE_URL_API: string().url().required(),
+  // TODO: // update when https url used
+  VITE_BASE_URL_API: string(),
+  // VITE_BASE_URL_API: string().url().required(),
   VITE_BASE_SERVER_URL_API: string(),
   VITE_BUILD_DATE: string().default('1970-01-01'),
   VITE_BUILD_TIME: string().default('00:00:00'),
