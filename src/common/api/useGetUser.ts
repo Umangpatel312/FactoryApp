@@ -35,7 +35,8 @@ export type User = {
   name: string;
   username: string;
   email: string;
-  phone: string;
+  mobileNumber: string;
+  managerId: number;
   website: string;
   address: Address;
   company: Company;

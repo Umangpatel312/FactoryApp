@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { useGetMachines } from '../api/useGetMachines';
 import MachineListItem from './MachineListItem';
 import LoaderSkeleton from 'common/components/Loader/LoaderSkeleton';
+import { useGetCurrentUser } from 'common/api/useGetUserRoles';
 
 /**
  * Properties for the `UserList` component.
@@ -21,8 +22,9 @@ interface UserListProps extends PropsWithClassName, PropsWithTestId { }
  */
 const MachineList = ({ className, testId = 'list-users' }: UserListProps): JSX.Element => {
   const { machineId } = useParams();
-  const { data: machines, error, isPending } = useGetMachines();
-
+  const { data: user } = useGetCurrentUser();
+  const { data: machines, error, isPending } = useGetMachines(user?.id);
+  console.log("machines list comp", machines, isPending, error);
   return (
     <div
       className={classNames('flex h-full flex-col overflow-y-auto', className)}

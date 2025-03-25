@@ -5,7 +5,7 @@ import { createContext } from 'react';
  */
 export interface Config {
   VITE_BASE_URL_API: string;
-  VITE_BASE_SERVER_URL_API: string;
+  // VITE_BASE_SERVER_URL_API: string;
   VITE_BUILD_DATE: string;
   VITE_BUILD_TIME: string;
   VITE_BUILD_TS: string;

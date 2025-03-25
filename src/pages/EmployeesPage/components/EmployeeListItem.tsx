@@ -1,7 +1,9 @@
 import { PropsWithClassName, PropsWithTestId } from '@leanstacks/react-common';
 import classNames from 'classnames';
 import { useNavigate } from 'react-router-dom';
-import { Employee } from 'common/api/useGetEmployee';
+
+import { User } from 'common/api/useGetUser';
+import Avatar from 'common/components/Icon/Avatar';
 
 /**
  * Properties for the `UserListItem` component.
@@ -12,7 +14,7 @@ import { Employee } from 'common/api/useGetEmployee';
  * @see {@link PropsWithTestId}
  */
 interface EmployeeListItemProps extends PropsWithClassName, PropsWithTestId {
-  employee: Employee;
+  employee: User;
   isActive?: boolean;
 }
 
@@ -34,7 +36,7 @@ const EmployeeListItem = ({
   const navigate = useNavigate();
 
   const doClick = () => {
-    navigate(`${employee.id}?tab=1`);
+    navigate(`edit/${employee.id}`);
   };
 
   return (
@@ -48,10 +50,13 @@ const EmployeeListItem = ({
       onClick={() => doClick()}
       data-testid={testId}
     >
-      <div className="flex min-w-0 flex-col">
-        <div className="truncate">{employee.name}</div>
-        {/* <div className="truncate text-xs opacity-75">{employee.email}</div> */}
+      <div className="flex items-center">
+        <Avatar value={employee.name} className="me-2 rounded-full" />
+        <div className="text-sm">{employee.name}</div>
       </div>
+      {/* <div className="flex min-w-0 flex-col">
+        <div className="truncate">{employee.name}</div>
+      </div> */}
     </div>
   );
 };

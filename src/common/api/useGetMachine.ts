@@ -2,6 +2,7 @@ import { UseQueryResult, useQuery } from '@tanstack/react-query';
 
 import { useAxios } from 'common/hooks/useAxios';
 import { useConfig } from 'common/hooks/useConfig';
+import { ApiResponse } from 'common/types/ApiResponse';
 import { QueryKeys } from 'common/utils/constants';
 
 
@@ -11,8 +12,14 @@ import { QueryKeys } from 'common/utils/constants';
 export type Machine = {
   id: number;
   name: string;
-  heads: number;
-  area: number;
+  heads?: number;
+  area?: number;
+  isActive?: boolean;
+  managerId?: number;
+  createdAt?: string;
+  ModifiedAt?: string;
+  createdBy?: number;
+  modifiedBy?: number;
 };
 
 /**
@@ -32,11 +39,14 @@ export const useGetMachine = ({ machineId }: MachineGetUserProps): UseQueryResul
   const axios = useAxios();
   const config = useConfig();
 
-  const getMachine = async (): Promise<Machine | null> => {
-    const response = await axios.request({
-      url: `${config.VITE_BASE_SERVER_URL_API}/machines/${machineId}`,
+  const getMachine = async (): Promise<Machine> => {
+    const response = await axios.request<ApiResponse<Machine>>({
+      url: `${config.VITE_BASE_URL_API}/v1/machines/${machineId}`,
     });
-    return response.data;
+    if (response.data.message !== "Machine details successfully!") {
+      throw new Error('Failed to fetch machine details');
+    }
+    return response.data.data;
   };
 
   return useQuery({

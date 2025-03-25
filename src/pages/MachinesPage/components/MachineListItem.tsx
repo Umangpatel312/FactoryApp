@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Machine } from 'common/api/useGetMachine';
 import { QRCodeCanvas } from "qrcode.react";
 import FAIcon from 'common/components/Icon/FAIcon';
+import Badge from 'common/components/Badge/Badge';
 
 
 /**
@@ -73,9 +74,18 @@ const MachineListItem = ({
           </div>
           <div className="min-w-0 flex-auto">
             <div className="truncate">{machine.name}</div>
+
             <div className="truncate text-xs opacity-75">{machine.heads}/{machine.area}</div>
           </div>
+
         </div>
+        <div>
+          <Badge className={machine.isActive ? '!bg-blue-600 dark:!bg-blue-700' : '!bg-neutral-500 uppercase dark:!bg-neutral-300 dark:text-black'} testId='my-badge'>
+
+            {machine.isActive ? "ACTIVE" : "INACTIVE"}
+          </Badge>
+        </div>
+
         <div className="shrink-0 sm:flex sm:flex-col sm:items-end">
           <FAIcon id={`qr-download-${machine.id}`} icon='download' size='lg' onClick={(e) => downloadQR(e, machine.id)} />
         </div>

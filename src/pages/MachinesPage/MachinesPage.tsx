@@ -58,11 +58,11 @@ const MachinesPage = (): JSX.Element => {
 
         </div>
 
-        <div className="my-6 hidden grid-cols-1 gap-8 md:grid md:grid-cols-4">
-          <div>
+        <div className="my-6 hidden grid-cols-1 gap-8 md:grid md:grid-cols-3">
+          <div className="md:col-span-1">
             <MachineList />
           </div>
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <Outlet />
           </div>
         </div>

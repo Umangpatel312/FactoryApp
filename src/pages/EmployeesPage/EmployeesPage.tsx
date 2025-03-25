@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import Page from 'common/components/Page/Page';
 import Text from 'common/components/Text/Text';
@@ -6,6 +6,10 @@ import EmployeeList from './components/EmployeeList';
 import Tabs from 'common/components/Tabs/Tabs';
 import { usePage } from 'common/hooks/usePage';
 import { useEffect } from 'react';
+import Button from 'common/components/Button/Button';
+import { ButtonVariant } from '@leanstacks/react-common';
+import FAIcon from 'common/components/Icon/FAIcon';
+import { useMediaQuery } from 'react-responsive';
 
 /**
  * The `EmployeesPage` component renders the layout for the users page. It
@@ -14,6 +18,10 @@ import { useEffect } from 'react';
  * @returns {JSX.Element} JSX
  */
 const EmployeesPage = (): JSX.Element => {
+  const isMobile: boolean = useMediaQuery({ maxWidth: 768 }); // Detect mobile view
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const { setPageTitle } = usePage();
   useEffect(() => {
     // This will be called once when the component mounts
@@ -25,27 +33,40 @@ const EmployeesPage = (): JSX.Element => {
     <Page testId="page-users">
       <div className="container mx-auto my-4 min-h-[50vh]">
 
+
         <div className="my-6 md:hidden">
-          <Tabs
-            tabs={[
-              { label: 'Employees', testId: 'tab-user-list' },
-              { label: 'Detail', testId: 'tab-user-detail' },
-            ]}
-            tabContents={[{ children: <EmployeeList /> }, { children: <Outlet />, className: 'my-6' }]}
-            variant="fullWidth"
-          />
+
+          {isMobile && (location.pathname.includes("create") || location.pathname.includes("edit")) ? <Outlet /> :
+            <>
+              <EmployeeList />
+              <div
+                className="group fixed bottom-10 right-10 z-10 flex h-14 w-14 items-center justify-center rounded-full uppercase leading-normal text-white !border-blue-600 !bg-blue-600 !text-white">
+                <Button
+                  variant={ButtonVariant.Text}
+                  data-twe-ripple-init
+                  data-twe-ripple-color="light"
+                  className="cursor-pointer rounded-full p-5"
+                  onClick={() => navigate("create")}
+                >
+                  <FAIcon icon='plus' />
+                </Button>
+
+              </div>
+            </>
+          }
+
         </div>
 
-        <div className="my-6 hidden grid-cols-1 gap-8 md:grid md:grid-cols-4">
-          <div>
+        <div className="my-6 hidden grid-cols-1 gap-8 md:grid md:grid-cols-3">
+          <div className="md:col-span-1">
             <EmployeeList />
           </div>
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <Outlet />
           </div>
         </div>
       </div>
-    </Page>
+    </Page >
   );
 };
 

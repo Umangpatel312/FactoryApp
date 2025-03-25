@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { useGetEmployees } from '../api/useGetEmployees';
 import EmployeeListItem from './EmployeeListItem';
 import LoaderSkeleton from 'common/components/Loader/LoaderSkeleton';
+import { useGetCurrentUser } from 'common/api/useGetUserRoles';
 
 /**
  * Properties for the `UserList` component.
@@ -21,7 +22,9 @@ interface EmployeeListProps extends PropsWithClassName, PropsWithTestId { }
  */
 const EmployeeList = ({ className, testId = 'list-users' }: EmployeeListProps): JSX.Element => {
   const { employeeId } = useParams();
-  const { data: employees, error, isPending } = useGetEmployees();
+  const { data: user } = useGetCurrentUser();
+
+  const { data: employees, error, isPending } = useGetEmployees(user?.id);
 
   return (
     <div

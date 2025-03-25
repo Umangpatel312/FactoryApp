@@ -57,7 +57,7 @@ const SigninForm = ({ className, testId = 'form-signin' }: SigninFormProps): JSX
   const navigate = useNavigate();
 
   return (
-    <div className={classNames('lg:w-2/3 xl:w-1/2', className)} data-testid={testId}>
+    <div className={classNames('lg:w-2/3 xl:w-1/2 border p-4 rounded-md shadow-md', className)} data-testid={testId}>
       {error && (
         <Alert
           variant={AlertVariant.Error}

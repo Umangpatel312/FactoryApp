@@ -37,7 +37,7 @@ export const useOTPVerify = () => {
     console.log(otpVerifyReqestPayload);
     // fetch all users
     const response = await axios.request<SignInResponsePayload>({
-      url: `${config.VITE_BASE_URL_API}/v1/users/verify-otp`,
+      url: `${config.VITE_BASE_URL_API}/auth/verify-otp`,
       method: 'post',
       data: otpVerifyReqestPayload
     });

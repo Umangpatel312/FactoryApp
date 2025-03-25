@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import reject from 'lodash/reject';
 
 import { QueryKeys } from 'common/utils/constants';
-import { Task } from 'pages/UsersPage/api/useGetUserTasks';
 import { useAxios } from 'common/hooks/useAxios';
 import { useConfig } from 'common/hooks/useConfig';
 import { Machine } from 'common/api/useGetMachine';
+import { ApiResponse } from 'common/types/ApiResponse';
 
 /**
  * The `useDeleteTask` mutation function variables.
@@ -31,13 +30,18 @@ export const useCreateMachine = () => {
    * Delete a `Task`.
    * @param {CreateMachineVariables} variables - The mutation function variables.
    */
-  const createMachine = async ({ machine }: CreateMachineVariables): Promise<void> => {
-    // throw new Error('Failed');
-    await axios.request({
+  const createMachine = async ({ machine }: CreateMachineVariables): Promise<ApiResponse<Machine>> => {
+    console.log("create machine", machine);
+    const response = await axios.request({
       method: 'post',
-      url: `${config.VITE_BASE_SERVER_URL_API}/machines`,
+      url: `${config.VITE_BASE_URL_API}/v1/machines`,
       data: machine
     });
+
+    if (response.data.message !== 'Machine details saved successfully!') {
+      throw new Error('Failed to create machine');
+    }
+    return response.data;
   };
 
   return useMutation({

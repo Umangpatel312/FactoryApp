@@ -28,6 +28,7 @@ import MachineForm from 'pages/MachinesPage/components/MachineForm';
 import EmployeesPage from 'pages/EmployeesPage/EmployeesPage';
 import EmployeeDetailEmpty from 'pages/EmployeesPage/components/EmployeeDetailEmpty';
 import SignupPage from 'pages/SignupPage/SignupPage';
+import EmployeeRegisterPage from 'pages/EmployeesPage/components/EmployeeRegisterPage';
 
 /**
  * The React Router configuration. An array of `RouteObject`.
@@ -187,11 +188,11 @@ export const routes: RouteObject[] = [
               },
               {
                 path: 'create',
-                element: <MachineForm />
+                element: <EmployeeRegisterPage />
               },
               {
-                path: 'edit/:machineId',
-                element: <MachineForm />
+                path: 'edit/:employeeId',
+                element: <EmployeeRegisterPage />
               }
             ],
           },

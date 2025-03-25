@@ -9,6 +9,8 @@ export enum QueryKeys {
   Users = 'Users',
   UserTokens = 'UserTokens',
   Machines = 'Machines',
+  UserMachines = 'UserMachines',
+  ManagerEmployees = 'ManagerEmployees',
   Employees = 'Employees',
   UserRoles = 'UserRoles'
 }

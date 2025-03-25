@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import classNames from 'classnames';
-import { Alert, AlertVariant, PropsWithClassName, PropsWithTestId } from '@leanstacks/react-common';
-import { Form, Formik } from 'formik';
+import { Alert, AlertVariant, ButtonVariant, PropsWithClassName, PropsWithTestId } from '@leanstacks/react-common';
+import { FieldArray, Form, Formik } from 'formik';
 import { number, object, string } from 'yup';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Button } from '@leanstacks/react-common';
@@ -18,7 +18,8 @@ import AlertWithTimer from 'common/components/Alert/Alert';
  * @see {@link PropsWithClassName}
  * @see {@link PropsWithTestId}
  */
-interface SignupFormProps extends PropsWithClassName, PropsWithTestId { }
+interface SignupFormProps extends PropsWithClassName, PropsWithTestId {
+}
 
 /**
  * Signin form values.
@@ -45,8 +46,13 @@ const validationSchema = object<SignUpFormValues>({
     // .min(12, 'Must have at least 12 characters. ')
     .required('Required. '),
   name: string().required('Required.'),
-  mobileNumber: string().required('Required.')
+  mobileNumber: string()
+    .matches(/[0-9]/, 'Must have a number. ')
+    .min(10, 'Must have at least 10 characters. ')
+    .max(10, 'Must have at least 10 characters. ')
+    .required('Required.')
 });
+
 
 const otpSchema = object<OtpFormValues>({
   otp: string()
@@ -79,8 +85,10 @@ const SignupForm = ({ className, testId = 'form-signup' }: SignupFormProps): JSX
 
   const [userId, setUserId] = useState<number>(0);
   const [message, setMessage] = useState<string>('');
+
+
   return (
-    <div className={classNames('lg:w-2/3 xl:w-1/2', className)} data-testid={testId}>
+    <div className={classNames('lg:w-2/3 xl:w-1/2 border p-4 rounded-md shadow-md', className)} data-testid={testId}>
       {error && (
         <Alert
           variant={AlertVariant.Error}
@@ -99,6 +107,7 @@ const SignupForm = ({ className, testId = 'form-signup' }: SignupFormProps): JSX
       {
         isOtpSent ?
           <Formik<OtpFormValues>
+            key="otp-form"
             initialValues={{ otp: '' }}
             validationSchema={otpSchema}
             onSubmit={(values, { setSubmitting }) => {
@@ -150,6 +159,7 @@ const SignupForm = ({ className, testId = 'form-signup' }: SignupFormProps): JSX
           </Formik>
           :
           <Formik<SignUpFormValues>
+            key="signup-form"
             initialValues={{ name: '', mobileNumber: '', password: '' }}
             validationSchema={validationSchema}
             onSubmit={async (values, { setSubmitting }) => {

@@ -4,6 +4,8 @@ import { useGetCurrentUser } from 'common/api/useGetUserRoles';
 import LoaderSkeleton from 'common/components/Loader/LoaderSkeleton';
 import Page from 'common/components/Page/Page';
 import UserTasksCard from 'pages/UsersPage/components/UserTasksCard';
+import { usePage } from 'common/hooks/usePage';
+import { useEffect } from 'react';
 
 /**
  * The `DashboardPage` component renders the content of the landing page
@@ -13,6 +15,13 @@ import UserTasksCard from 'pages/UsersPage/components/UserTasksCard';
 const DashboardPage = (): JSX.Element => {
   const { t } = useTranslation();
   const { data: user } = useGetCurrentUser();
+  const { setPageTitle } = usePage();
+  useEffect(() => {
+    // This will be called once when the component mounts
+    setPageTitle("Dashboard");
+
+    // Optional cleanup function (not needed in this case)
+  }, [setPageTitle]);
 
   return (
     <Page testId="page-dashboard">
@@ -28,8 +37,10 @@ const DashboardPage = (): JSX.Element => {
               <LoaderSkeleton className="h-7" testId="page-dashboard-loader" />
             )}
           </div>
-
-          {user && <UserTasksCard userId={user.id} />}
+          {
+            user && <p>coming soon</p>
+          }
+          {/* {user && <UserTasksCard userId={user.id} />} */}
         </div>
       </div>
     </Page>
