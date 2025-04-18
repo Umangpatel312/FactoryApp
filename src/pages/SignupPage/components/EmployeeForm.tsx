@@ -3,20 +3,13 @@ import classNames from 'classnames';
 import { Alert, AlertVariant, ButtonVariant, PropsWithClassName, PropsWithTestId } from '@leanstacks/react-common';
 import { FieldArray, Form, Formik } from 'formik';
 import { number, object, string } from 'yup';
-import { NavLink, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@leanstacks/react-common';
-
-import { useOTPVerify } from '../api/useOtpVerify';
 import TextField from 'common/components/Form/TextField';
 import FAIcon from 'common/components/Icon/FAIcon';
-import Text from 'common/components/Text/Text';
-import { useSignup } from '../api/useSignup';
 import AlertWithTimer from 'common/components/Alert/Alert';
-import { useEffect } from 'react';
 import { useGetCurrentUser } from 'common/api/useGetUserRoles';
 import { EmployeeRequestPayload, useCreateEmployee } from '../api/useCreateEmployee';
-import { useGetEmployees } from 'pages/EmployeesPage/api/useGetEmployees';
-import { User } from 'common/api/useGetUser';
 import LoaderSkeleton from 'common/components/Loader/LoaderSkeleton';
 import { useGetEmployee } from 'common/api/useGetEmployee';
 import { useUpdateEmployee } from '../api/useUpdateEmployee';
@@ -87,7 +80,8 @@ const updateValidationOfEmployeeSchema = object<SignUpFormOfEmployeeValues>({
  * @returns {JSX.Element} JSX
  */
 const EmployeeForm = ({ className, testId = 'form-signup' }: SignupFormProps): JSX.Element => {
-  const { employeeId = '0' } = useParams();
+  const { employeeId } = useParams();
+  const employeeIdNumber = employeeId ? parseInt(employeeId, 10) : undefined;
 
   const [error, setError] = useState<string>('');
 
@@ -98,7 +92,7 @@ const EmployeeForm = ({ className, testId = 'form-signup' }: SignupFormProps): J
   const [message, setMessage] = useState<string>('');
   const { data: currentUser } = useGetCurrentUser();
 
-  const { data: employee, isLoading } = useGetEmployee({ employeeId: +employeeId });
+  const { data: employee, isLoading } = useGetEmployee({ employeeId: employeeIdNumber });
 
 
   console.log("employee: ", employee);

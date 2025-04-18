@@ -3,7 +3,7 @@ import { BaseComponentProps } from '@leanstacks/react-common';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { faCircle as faCircleRegular } from '@fortawesome/free-regular-svg-icons';
+import { faCalendar, faCircle as faCircleRegular } from '@fortawesome/free-regular-svg-icons';
 import {
   faBars,
   faBuilding,
@@ -35,7 +35,14 @@ import {
   faXmark,
   faGears,
   faDownload,
-  faPlus
+  faPlus,
+  faTimes,
+  faCamera,
+  faFilter,
+  faList,
+  faInbox,
+  faUndo,
+  faSearch
 } from '@fortawesome/free-solid-svg-icons';
 
 /**
@@ -45,6 +52,8 @@ import {
 export type FAIconName =
   | 'bars'
   | 'building'
+  | 'camera'
+  | 'calendar'
   | 'check'
   | 'chevronDown'
   | 'chevronUp'
@@ -56,9 +65,12 @@ export type FAIconName =
   | 'circleXmark'
   | 'download'
   | 'envelope'
+  | 'filter'
+  | 'inbox'
   | 'gears'
   | 'language'
   | 'link'
+  | 'list'
   | 'listCheck'
   | 'magnifyingGlass'
   | 'mapLocationDot'
@@ -70,9 +82,12 @@ export type FAIconName =
   | 'puzzlePiece'
   | 'rightFromBracket'
   | 'rightToBracket'
+  | 'search'
   | 'sliders'
   | 'sun'
+  | 'time'
   | 'trash'
+  | 'undo'
   | 'users'
   | 'xmark';
 
@@ -94,6 +109,8 @@ export interface FAIconProps
 const icons: Record<FAIconName, IconProp> = {
   bars: faBars,
   building: faBuilding,
+  camera: faCamera,
+  calendar: faCalendar,
   check: faCheck,
   chevronDown: faChevronDown,
   chevronUp: faChevronUp,
@@ -105,9 +122,12 @@ const icons: Record<FAIconName, IconProp> = {
   circleXmark: faCircleXmark,
   download: faDownload,
   envelope: faEnvelope,
+  filter: faFilter,
   gears: faGears,
+  inbox: faInbox,
   language: faLanguage,
   link: faLink,
+  list: faList,
   listCheck: faListCheck,
   magnifyingGlass: faMagnifyingGlass,
   mapLocationDot: faMapLocationDot,
@@ -119,9 +139,12 @@ const icons: Record<FAIconName, IconProp> = {
   puzzlePiece: faPuzzlePiece,
   rightFromBracket: faRightFromBracket,
   rightToBracket: faRightToBracket,
+  search: faSearch,
   sliders: faSliders,
   sun: faSun,
+  time: faTimes,
   trash: faTrash,
+  undo: faUndo,
   users: faUsers,
   xmark: faXmark
 };

@@ -29,6 +29,10 @@ import EmployeesPage from 'pages/EmployeesPage/EmployeesPage';
 import EmployeeDetailEmpty from 'pages/EmployeesPage/components/EmployeeDetailEmpty';
 import SignupPage from 'pages/SignupPage/SignupPage';
 import EmployeeRegisterPage from 'pages/EmployeesPage/components/EmployeeRegisterPage';
+import AttendencePage from 'pages/AttendencePage/AttendencePage';
+import AttendenceDetailEmpty from 'pages/AttendencePage/components/AttendenceDetailEmpty';
+import AttendenceForm from 'pages/AttendencePage/components/AttendenceForm';
+import EmployeeAttendenceForm from 'pages/AttendencePage/components/EmployeeAttendenceForm';
 
 /**
  * The React Router configuration. An array of `RouteObject`.
@@ -195,6 +199,43 @@ export const routes: RouteObject[] = [
                 element: <EmployeeRegisterPage />
               }
             ],
+          },
+          {
+            path: 'attendence',
+            element: <AttendencePage />,
+            children: [
+              {
+                index: true,
+                element: <AttendenceDetailEmpty />,
+              },
+              {
+                path: ':machineId',
+                element: <MachineDetailLayout />,
+                children: [
+                  { index: true, element: <UserDetail /> },
+                  {
+                    path: 'tasks',
+                    element: <UserTaskList />,
+                  },
+                  {
+                    path: 'tasks/:taskId',
+                    element: <TaskDetail />,
+                  },
+                ],
+              },
+              {
+                path: 'create',
+                element: <AttendenceForm />
+              },
+              {
+                path: 'edit/:employeeId',
+                element: <EmployeeRegisterPage />
+              }
+            ],
+          },
+          {
+            path: 'employee/attendendenceForm',
+            element: <EmployeeAttendenceForm />
           },
         ],
       },

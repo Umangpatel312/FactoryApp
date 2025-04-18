@@ -12,7 +12,9 @@ export enum QueryKeys {
   UserMachines = 'UserMachines',
   ManagerEmployees = 'ManagerEmployees',
   Employees = 'Employees',
-  UserRoles = 'UserRoles'
+  UserRoles = 'UserRoles',
+  Attendences = 'Attendences',
+  Attendence = 'Attendence',
 }
 
 /**

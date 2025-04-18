@@ -1,183 +1,178 @@
-import { InputHTMLAttributes, useEffect, useMemo, useState } from 'react';
+import { InputHTMLAttributes, useEffect, useState, useRef } from 'react';
 import { PropsWithTestId } from '@leanstacks/react-common';
-import { useField } from 'formik';
 import classNames from 'classnames';
-
 import FAIcon from 'common/components/Icon/FAIcon';
 
-/**
- * Describes a single option for a `SelectField`. If `label` is omitted,
- * the `value` is displayed.
- * @param {string} [label] - Optional. The text to display. If omitted, the
- * `value` is displayed.
- * @param {string} value - The value of the option.
- */
 export interface SelectFieldOption {
   label?: string;
   value: string;
 }
 
-/**
- * Properties for the `SelectField` component.
- * @param {string} [label] - Optional. A field label.
- * @param {function} [onChange] - Optional. Change event handler function.
- * @param {SelectFieldOption[]} options - The array of `SelectFieldOption` values.
- * @param {string} [supportingText] - Optional. Help text associated with the field.
- * @see {@link InputHTMLAttributes}
- * @see {@link PropsWithTestId}
- */
-interface SelectFieldProps extends InputHTMLAttributes<HTMLSelectElement>, PropsWithTestId {
+interface SelectFieldProps extends Omit<InputHTMLAttributes<HTMLSelectElement>, 'onChange' | 'value'>, PropsWithTestId {
   label?: string;
   name: string;
-  onChange?: () => void;
+  onChange?: (value: string) => void;
   options: SelectFieldOption[];
   supportingText?: string;
+  value?: string;
+  error?: string;
 }
 
-/**
- * The `SelectField` component renders a HTML `select` element. Displays a
- * fixed set of options from which the user may select.
- * @param {SelectFieldProps} props - Component properties, `SelectFieldProps`.
- * @returns {JSX.Element} JSX
- */
 const SelectField = ({
   className,
   label,
+  name,
   onChange,
   options,
   supportingText,
   testId = 'field-select',
+  value,
+  error,
   ...props
 }: SelectFieldProps): JSX.Element => {
-  const [field, meta, helper] = useField(props);
-  const [showInput, setShowInput] = useState(!!field.value || !!props.autoFocus);
-  const [isExpanded, setIsExpanded] = useState(!!props.autoFocus);
-  const showError = meta.touched && meta.error;
+  const [isExpanded, setIsExpanded] = useState(false);
+  const selectRef = useRef<HTMLDivElement>(null);
   const isDisabled = !!props.disabled || !!props.readOnly;
 
-  /**
-   * Update `showInput` when field is modified.
-   */
+  const selectedOption = options.find(option => String(option.value) === String(value));
+  const selectedLabel = selectedOption?.label ?? selectedOption?.value;
+
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+  const optionsRef = useRef<HTMLDivElement>(null);
+
+  const handleSelect = (newValue: string) => {
+    setIsExpanded(false);
+    onChange?.(newValue);
+  };
+
   useEffect(() => {
-    setShowInput(!!field.value || !!props.autoFocus);
-  }, [field.value, props.autoFocus]);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+        setIsExpanded(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  /**
-   * Toggle the open/close state of the select field.
-   */
-  const toggleExpanded = () => {
-    if (!isDisabled) {
-      setIsExpanded(!isExpanded);
-    }
+  const updateDropdownPosition = () => {
+    if (!selectRef.current || !optionsRef.current) return;
+
+    const selectRect = selectRef.current.getBoundingClientRect();
+    const optionsHeight = optionsRef.current.scrollHeight;
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - selectRect.bottom;
+    const spaceAbove = selectRect.top;
+
+    // Check if dropdown should open upward
+    const shouldOpenUpward = spaceBelow < optionsHeight && spaceAbove > spaceBelow;
+
+    setDropdownStyle({
+      maxHeight: '250px', // Set max height for scrolling
+      position: 'fixed',
+      width: selectRect.width,
+      left: selectRect.left,
+      [shouldOpenUpward ? 'bottom' : 'top']: shouldOpenUpward
+        ? viewportHeight - selectRect.top
+        : selectRect.bottom,
+    });
   };
 
-  /**
-   * Perform actions when a specific `SelectFieldOption` is selected.
-   * @param value - The value of the selected `SelectFieldOption`.
-   * @returns {Promise<void>} Returns an empty Promise.
-   */
-  const doSelectOption = async (value: string): Promise<void> => {
-    await helper.setTouched(true);
-    await helper.setValue(value);
-    onChange?.();
-  };
-
-  /**
-   * Calculate the value of the the currently selected item to be displayed
-   * in the `SelectField`. If there is a value, returns the `label` if present,
-   * otherwise returns the `value`. If the `SelectField` does not have a
-   * value, returns `undefined`.
-   */
-  const selectedValue = useMemo(() => {
-    if (field.value) {
-      const selectedOption = options.find((option) => option.value === field.value);
-      return selectedOption?.label ?? selectedOption?.value;
+  useEffect(() => {
+    if (isExpanded) {
+      updateDropdownPosition();
+      window.addEventListener('scroll', updateDropdownPosition);
+      window.addEventListener('resize', updateDropdownPosition);
     }
-    return undefined;
-  }, [field.value, options]);
 
-  return (
-    <div className={className} onClick={toggleExpanded} role="listbox" data-testid={testId}>
-      <div
-        className={classNames(
-          'flex h-16 items-center border-b border-neutral-500/50 bg-neutral-500/10 px-4 py-2',
-          { '!border-blue-600': isExpanded },
-          { 'cursor-default opacity-50 hover:bg-neutral-500/10': isDisabled },
-          {
-            'cursor-pointer hover:bg-neutral-500/25': !isDisabled,
-          },
-        )}
-      >
+    return () => {
+      window.removeEventListener('scroll', updateDropdownPosition);
+      window.removeEventListener('resize', updateDropdownPosition);
+    };
+  }, [isExpanded]);
+
+  const renderOptions = () => (
+    <div
+      ref={optionsRef}
+      style={dropdownStyle}
+      className={classNames(
+        'overflow-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent',
+        'absolute z-50 w-full rounded-md border border-gray-200 bg-white py-1 shadow-lg'
+      )}
+    >
+      {options.map(({ label, value: optionValue }) => (
         <div
+          key={optionValue}
+          onClick={() => handleSelect(optionValue)}
           className={classNames(
-            'flex flex-grow flex-col',
+            'flex cursor-pointer items-center px-4 py-2 text-sm transition-colors',
             {
-              'justify-between': showInput,
-            },
-            {
-              'justify-center': !showInput,
-            },
+              'bg-blue-50 text-blue-700': String(value) === String(optionValue),
+              'text-gray-700 hover:bg-gray-50': String(value) !== String(optionValue)
+            }
           )}
         >
-          {label && (
-            <label
-              htmlFor={props.id ?? props.name}
-              className={classNames('opacity-75', { 'text-sm': showInput })}
-              data-testid={`${testId}-label`}
-            >
-              {label}
-            </label>
+          <span className="flex-grow">{label ?? optionValue}</span>
+          {String(value) === String(optionValue) && (
+            <FAIcon icon="check" className="ml-2 text-blue-600" />
           )}
-          <div
-            id={props.id ?? props.name}
-            className={classNames('', { 'size-0': !showInput })}
-            data-testid={`${testId}-select`}
-          >
-            {selectedValue}
-          </div>
         </div>
-        <FAIcon
-          icon={isExpanded ? 'chevronUp' : 'chevronDown'}
-          className="ms-2"
-          testId={`${testId}-icon-expand`}
-        />
-      </div>
-      {supportingText && (
-        <div className="my-1 ms-4 text-sm opacity-75" data-testid={`${testId}-supporting-text`}>
-          {supportingText}
-        </div>
-      )}
-      {showError && (
-        <div className="my-1 ms-4 text-sm text-red-600" data-testid={`${testId}-error`}>
-          {meta.error}
-        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className={classNames('relative', className)} ref={selectRef}>
+      {label && (
+        <label htmlFor={name} className="mb-2 block text-sm font-medium text-gray-700">
+          {label}
+        </label>
       )}
 
       <div
-        className={classNames('max-h-64 overflow-y-auto bg-neutral-500/10', {
-          hidden: !isExpanded,
-        })}
-        data-testid={`${testId}-options`}
+        onClick={() => !isDisabled && setIsExpanded(!isExpanded)}
+        className={classNames(
+          'relative flex min-h-[42px] cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm transition-colors',
+          {
+            'cursor-not-allowed opacity-50': isDisabled,
+            'border-red-300 ring-1 ring-red-300': error,
+            'border-blue-500 ring-1 ring-blue-500': isExpanded,
+            'hover:border-blue-400': !isDisabled && !error
+          }
+        )}
       >
-        {options.map(({ label, value }) => (
-          <div
-            className={classNames(
-              'flex h-16 cursor-pointer items-center border-b border-neutral-500/50 px-4 last:border-none hover:bg-neutral-500/25',
-              {
-                'cursor-auto bg-neutral-500/25': field.value === value,
-              },
-            )}
-            onClick={() => doSelectOption(value)}
-            role="option"
-            aria-selected={field.value === value}
-            data-testid={`${testId}-option-${value}`}
-            key={value}
-          >
-            <div className="flex-grow">{label ?? value}</div>
-            {field.value === value && <FAIcon icon="check" className="ms-2 text-green-600" />}
-          </div>
-        ))}
+        <span className={classNames('block truncate', {
+          'text-gray-500': !selectedLabel
+        })}>
+          {selectedLabel || 'Select an option'}
+        </span>
+        <FAIcon
+          icon="chevronDown"
+          className={classNames(
+            'ml-2 transition-transform duration-200',
+            {
+              'transform rotate-180': isExpanded
+            }
+          )}
+        />
       </div>
+
+      {/* Dropdown Options */}
+      {isExpanded && renderOptions()}
+
+      {/* Supporting Text */}
+      {supportingText && !error && (
+        <p className="mt-1 text-sm text-gray-500">
+          {supportingText}
+        </p>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <p className="mt-1 text-sm text-red-600">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

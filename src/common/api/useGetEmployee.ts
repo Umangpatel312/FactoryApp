@@ -18,7 +18,7 @@ interface EmployeeResponse {
  * @param {number} userId - A `User` identifier.
  */
 interface UseGetEmployeeProps {
-  employeeId?: number;
+  employeeId?: number | undefined;
 }
 
 /**
