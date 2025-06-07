@@ -1,4 +1,4 @@
-import { UseQueryResult, useQuery } from '@tanstack/react-query';
+import { QueryKey, UseQueryResult, useQuery } from '@tanstack/react-query';
 
 import { User } from 'common/api/useGetUser';
 import { useAxios } from 'common/hooks/useAxios';
@@ -12,7 +12,9 @@ import { QueryKeys } from 'common/utils/constants';
  * @param {number} managerId - The manager identifier.
  * @returns Returns a `UseQueryResult` with `Employee` collection data.
  */
-export const useGetEmployees = (managerId?: number): UseQueryResult<User[], Error> => {
+import { UseQueryOptions } from '@tanstack/react-query';
+
+export const useGetEmployees = (managerId?: number, options?: Partial<UseQueryOptions<User[], Error, User[], QueryKey>>): UseQueryResult<User[], Error> => {
   const axios = useAxios();
   const config = useConfig();
 
@@ -24,8 +26,9 @@ export const useGetEmployees = (managerId?: number): UseQueryResult<User[], Erro
   };
 
   return useQuery({
-    queryKey: [QueryKeys.ManagerEmployees, managerId],
+    queryKey: [QueryKeys.Employees, managerId],
     queryFn: getEmployees,
-    enabled: !!managerId, // Ensure the query only runs if managerId is provided
+    enabled: (options && typeof options.enabled !== 'undefined') ? options.enabled : !!managerId,
+    ...(options || {}),
   });
 };

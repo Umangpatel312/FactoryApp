@@ -52,6 +52,6 @@ export const useGetMachine = ({ machineId }: MachineGetUserProps): UseQueryResul
   return useQuery({
     queryKey: [QueryKeys.Machines, machineId],
     queryFn: () => getMachine(),
-    enabled: !!machineId,
+    enabled: !!machineId, 
   });
 };

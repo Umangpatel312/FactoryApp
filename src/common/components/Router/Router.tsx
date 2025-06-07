@@ -19,6 +19,7 @@ import UsersPage from 'pages/UsersPage/UsersPage';
 import UserDetailLayout from 'pages/UsersPage/components/UserDetailLayout';
 import UserDetail from 'pages/UsersPage/components/UserDetail';
 import UserDetailEmpty from 'pages/UsersPage/components/UserDetailEmpty';
+import SalaryPage from 'pages/SalaryPage/SalaryPage';
 import UserTaskList from 'pages/UsersPage/components/UserTaskList';
 import TaskDetail from 'pages/UsersPage/Tasks/components/TaskDetail';
 import MachinesPage from 'pages/MachinesPage/MachinesPage';
@@ -166,6 +167,10 @@ export const routes: RouteObject[] = [
                 element: <MachineForm />
               }
             ],
+          },
+          {
+            path: 'salary',
+            element: <SalaryPage />,
           },
           {
             path: 'employees',

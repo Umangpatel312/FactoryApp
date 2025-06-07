@@ -48,7 +48,7 @@ export const useCreateMachine = () => {
     mutationFn: createMachine,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QueryKeys.Machines]
+        queryKey: [QueryKeys.UserMachines]
       });
     },
   });

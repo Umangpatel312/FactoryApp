@@ -44,7 +44,7 @@ const AppMenu = ({ side = 'right', testId = 'menu-app', ...props }: AppMenuProps
             Sign Out
           </MenuNavLink>
           <MenuSeparator />
-          <MenuNavLink to="/app/settings" title="Settings" icon="sliders">
+          {/* <MenuNavLink to="/app/settings" title="Settings" icon="sliders">
             Settings
           </MenuNavLink>
           <MenuNavLink to="/app/components" title="Components" icon="puzzlePiece">
@@ -52,23 +52,26 @@ const AppMenu = ({ side = 'right', testId = 'menu-app', ...props }: AppMenuProps
           </MenuNavLink>
           <MenuNavLink to="/app/users" title="Users" icon="users">
             Users
-          </MenuNavLink>
+          </MenuNavLink> */}
           <MenuNavLink to="/app/machines" title="Users" icon="gears">
             Machines
           </MenuNavLink>
           <MenuNavLink to="/app/employees" title="Users" icon="users">
             Employees
           </MenuNavLink>
-          <MenuNavLink to="/app/attendence" title="Users" icon="gears">
+          <MenuNavLink to="/app/attendence" title="Users" icon="penToSquare">
             Attendence
           </MenuNavLink>
-          <MenuNavLink to="/app/billing" title="Users" icon="gears">
+          <MenuNavLink to="/app/salary" title="Salary" icon="handHoldingDollar">
+            Salary
+          </MenuNavLink>
+          <MenuNavLink to="/app/billing" title="Users" icon="moneyBill">
             Billing
           </MenuNavLink>
-          <MenuNavLink to="/app/admin/userAccess" title="Users" icon="gears">
+          <MenuNavLink to="/app/admin/userAccess" title="Users" icon="universalAccess">
             User Access
           </MenuNavLink>
-          <MenuNavLink to="/app/admin/paymentHistory" title="Users" icon="gears">
+          <MenuNavLink to="/app/admin/paymentHistory" title="Users" icon="fileInvoice">
             Payment History
           </MenuNavLink>
         </>

@@ -3,7 +3,7 @@ import { BaseComponentProps } from '@leanstacks/react-common';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { faCalendar, faCircle as faCircleRegular } from '@fortawesome/free-regular-svg-icons';
+import { faCalendar, faCircle as faCircleRegular, faPenToSquare } from '@fortawesome/free-regular-svg-icons';
 import {
   faBars,
   faBuilding,
@@ -42,7 +42,11 @@ import {
   faList,
   faInbox,
   faUndo,
-  faSearch
+  faSearch,
+  faHandHoldingDollar,
+  faMoneyBill,
+  faFileInvoice,
+  faUniversalAccess
 } from '@fortawesome/free-solid-svg-icons';
 
 /**
@@ -66,6 +70,7 @@ export type FAIconName =
   | 'download'
   | 'envelope'
   | 'filter'
+  | 'fileInvoice'
   | 'inbox'
   | 'gears'
   | 'language'
@@ -75,8 +80,10 @@ export type FAIconName =
   | 'magnifyingGlass'
   | 'mapLocationDot'
   | 'moon'
+  | 'moneyBill'
   | 'paintbrush'
   | 'pencil'
+  | 'penToSquare'
   | 'phone'
   | 'plus'
   | 'puzzlePiece'
@@ -89,7 +96,9 @@ export type FAIconName =
   | 'trash'
   | 'undo'
   | 'users'
-  | 'xmark';
+  | 'universalAccess'
+  | 'xmark'
+  | 'handHoldingDollar';
 
 /**
  * Properties for the `FAIcon` component.
@@ -123,6 +132,7 @@ const icons: Record<FAIconName, IconProp> = {
   download: faDownload,
   envelope: faEnvelope,
   filter: faFilter,
+  fileInvoice: faFileInvoice,
   gears: faGears,
   inbox: faInbox,
   language: faLanguage,
@@ -132,8 +142,10 @@ const icons: Record<FAIconName, IconProp> = {
   magnifyingGlass: faMagnifyingGlass,
   mapLocationDot: faMapLocationDot,
   moon: faMoon,
+  moneyBill: faMoneyBill,
   paintbrush: faPaintBrush,
   pencil: faPencil,
+  penToSquare: faPenToSquare,
   phone: faPhone,
   plus: faPlus,
   puzzlePiece: faPuzzlePiece,
@@ -146,7 +158,9 @@ const icons: Record<FAIconName, IconProp> = {
   trash: faTrash,
   undo: faUndo,
   users: faUsers,
-  xmark: faXmark
+  universalAccess: faUniversalAccess,
+  xmark: faXmark,
+  handHoldingDollar: faHandHoldingDollar
 };
 
 /**
