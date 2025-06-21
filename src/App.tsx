@@ -1,6 +1,5 @@
 import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import ErrorBoundary from 'common/components/Errors/ErrorBoundary';
 import ErrorFallback from 'common/components/Errors/ErrorFallback';
@@ -49,7 +48,6 @@ function App(): JSX.Element {
                   </AxiosContextProvider>
                 </AuthContextProvider>
               </Theme>
-              <ReactQueryDevtools initialIsOpen={false} />
             </SettingsContextProvider>
           </QueryClientProvider>
         </ConfigContextProvider>
