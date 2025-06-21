@@ -16,6 +16,7 @@ const AuthContextProvider = ({ children }: PropsWithChildren): JSX.Element => {
 
   const value: AuthContextValue = {
     isAuthenticated: isSuccess,
+    isLoading: isPending,
     userToken: userTokens,
     refetchUserTokens,
   };

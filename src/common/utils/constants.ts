@@ -15,7 +15,8 @@ export enum QueryKeys {
   UserRoles = 'UserRoles',
   Attendences = 'Attendences',
   Attendence = 'Attendence',
-  AdvanceSalaries = 'AdvanceSalaries'
+  AdvanceSalaries = 'AdvanceSalaries',
+  AttendanceImage = 'AttendanceImage'
 }
 
 /**

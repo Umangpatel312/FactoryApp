@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 
-import { useGetCurrentUser } from 'common/api/useGetUserRoles';
+import { useGetCurrentUser } from 'common/api/useGetCurrentUser';
 import Avatar from 'common/components/Icon/Avatar';
 import LoaderSkeleton from 'common/components/Loader/LoaderSkeleton';
 import MenuNavLink from 'common/components/Menu/MenuNavLink';

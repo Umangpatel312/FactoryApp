@@ -14,7 +14,7 @@ export type Attendance = {
   id?: number;
   attendanceDate: number;
   production?: number;
-  frame?: number;
+  frames?: number;
   dhaga?: number;
   userId?: number;
   userName?: string;

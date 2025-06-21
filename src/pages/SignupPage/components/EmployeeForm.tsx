@@ -8,7 +8,7 @@ import { Button } from '@leanstacks/react-common';
 import TextField from 'common/components/Form/TextField';
 import FAIcon from 'common/components/Icon/FAIcon';
 import AlertWithTimer from 'common/components/Alert/Alert';
-import { useGetCurrentUser } from 'common/api/useGetUserRoles';
+import { useGetCurrentUser } from 'common/api/useGetCurrentUser';
 import { EmployeeRequestPayload, useCreateEmployee } from '../api/useCreateEmployee';
 import LoaderSkeleton from 'common/components/Loader/LoaderSkeleton';
 import { useGetEmployee } from 'common/api/useGetEmployee';
@@ -35,12 +35,8 @@ interface SignUpFormOfEmployeeValues {
 
 const validationOfEmployeeSchema = object<SignUpFormOfEmployeeValues>({
   password: string()
-    // .matches(/[0-9]/, 'Must have a number. ')
-    // .matches(/[a-z]/, 'Must have a lowercase letter. ')
-    // .matches(/[A-Z]/, 'Must have an uppercase letter. ')
-    // .matches(/[$*.[{}()?"!@#%&/,><':;|_~`^\]\\]/, 'Must have a special character. ')
-    // .min(12, 'Must have at least 12 characters. ')
-    .required('Required. '),
+      .min(4, 'Password must be at least 4 characters')
+      .required('Password is required'),
   name: string().required('Required.'),
   mobileNumber: string()
     .matches(/[0-9]/, 'Must have a number. ')
@@ -138,7 +134,7 @@ const EmployeeForm = ({ className, testId = 'form-signup' }: SignupFormProps): J
           }
 
           <Formik<EmployeeRequestPayload>
-            key="employee-form"
+            key={`employee-form-${employeeId}`}
             initialValues={employee ? employee : {
               id: 0,
               name: '', mobileNumber: '', password: '',
@@ -199,22 +195,22 @@ const EmployeeForm = ({ className, testId = 'form-signup' }: SignupFormProps): J
                     </>
                   )}
                 </FieldArray>
-                <div >
+                <div className="flex flex-col sm:flex-row gap-4 mt-6">
                   <Button
                     type="submit"
-                    variant={ButtonVariant.Text}
-                    className="w-full sm:w-40 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 mr-2"
+                    variant={ButtonVariant.Solid}
+                    className="w-full sm:w-40 justify-center"
                     disabled={isSubmitting || !dirty}
                     testId={`${testId}-button-submit`}
                   >
-                    Add
+                    {isSubmitting ? 'Adding...' : 'Add'}
                   </Button>
                   <Button
                     type="button"
+                    variant={ButtonVariant.Outline}
                     onClick={() => navigate(-1)}
-                    className="w-full sm:w-40"
-                    // disabled={isSubmitting || !dirty}
-                    testId={`${testId}-button-submit`}
+                    className="w-full sm:w-40 justify-center"
+                    testId={`${testId}-button-cancel`}
                   >
                     Cancel
                   </Button>

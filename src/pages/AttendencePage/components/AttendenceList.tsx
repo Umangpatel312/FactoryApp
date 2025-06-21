@@ -3,20 +3,21 @@ import { ButtonVariant, PropsWithClassName, PropsWithTestId } from '@leanstacks/
 import classNames from 'classnames';
 
 import LoaderSkeleton from 'common/components/Loader/LoaderSkeleton';
-import { useGetCurrentUser } from 'common/api/useGetUserRoles';
+import { useGetCurrentUser } from 'common/api/useGetCurrentUser';
 import { useGetEmployees } from 'pages/EmployeesPage/api/useGetEmployees';
 import { useEffect, useMemo, useState } from 'react';
 import Button from 'common/components/Button/Button';
-import { useGetAttendences } from '../api/useGetAttendences';
 import FAIcon from 'common/components/Icon/FAIcon';
 import SelectField from 'common/components/Form/SelectField';
 import { format, subMonths, startOfMonth, endOfMonth, startOfDay, endOfDay } from 'date-fns';
 import { useGetUseRoles } from 'common/api/useGetUseRoles';
-
+import { useGetAttendences } from '../api/useGetAttendences';
+import { AttendanceImageModal } from './AttendanceImageModal';
+import { CalendarView } from 'common/components/Calendar/CalendarView';
 
 interface UserListProps extends PropsWithClassName, PropsWithTestId { }
 
-export enum ViewType {
+enum ViewType {
   LIST = 'list',
   CALENDAR = 'calendar'
 }
@@ -181,37 +182,15 @@ const AttendenceList = ({ className, testId = 'list-users' }: UserListProps): JS
   };
 
   const [viewType, setViewType] = useState<ViewType>(ViewType.LIST);
+  const [selectedAttendanceId, setSelectedAttendanceId] = useState<number | null>(null);
 
-  // const renderViewToggle = () => (
-  //   <div className="mb-4 flex items-center justify-end space-x-2">
-  //     <Button
-  //       variant={ButtonVariant.Text}
-  //       onClick={() => setViewType(ViewType.LIST)}
-  //       className={classNames(
-  //         'px-4 py-2 rounded-lg transition-colors duration-200',
-  //         viewType === ViewType.LIST
-  //           ? 'bg-blue-600 text-white'
-  //           : 'text-gray-700 hover:bg-gray-100'
-  //       )}
-  //     >
-  //       <FAIcon icon="list" className="mr-2" />
-  //       List
-  //     </Button>
-  //     <Button
-  //       variant={ButtonVariant.Text}
-  //       onClick={() => setViewType(ViewType.CALENDAR)}
-  //       className={classNames(
-  //         'px-4 py-2 rounded-lg transition-colors duration-200',
-  //         viewType === ViewType.CALENDAR
-  //           ? 'bg-blue-600 text-white'
-  //           : 'text-gray-700 hover:bg-gray-100'
-  //       )}
-  //     >
-  //       <FAIcon icon="calendar" className="mr-2" />
-  //       Calendar
-  //     </Button>
-  //   </div>
-  // );
+  const handleViewImage = (attendanceId: number | undefined) => {
+    setSelectedAttendanceId(attendanceId ?? 0);
+  };
+
+  const handleCloseImage = () => {
+    setSelectedAttendanceId(null);
+  };
 
   const renderListView = () => (
     <div className="divide-y divide-gray-200">
@@ -226,8 +205,7 @@ const AttendenceList = ({ className, testId = 'list-users' }: UserListProps): JS
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-500">
-                {new Date(attendance.attendanceDate * 1000).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
-                }
+                {new Date(attendance.attendanceDate * 1000).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })}
               </p>
               <p className="mt-1 text-sm font-semibold text-gray-900">
                 Production: {attendance.production}
@@ -235,11 +213,25 @@ const AttendenceList = ({ className, testId = 'list-users' }: UserListProps): JS
             </div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-4 text-sm text-gray-600">
-            <div>Frame: {attendance.frame}</div>
+            <div>Frame: {attendance.frames}</div>
             <div>Dhaga: {attendance.dhaga}</div>
+          </div>
+          <div className="mt-2 flex justify-end">
+            <button
+              className="p-2 text-blue-600 hover:text-blue-700 transition-colors"
+              onClick={() => handleViewImage(attendance.id)}
+              title="View Image"
+            >
+              <FAIcon icon="image" className="text-xl" />
+            </button>
           </div>
         </div>
       ))}
+      <AttendanceImageModal
+        attendanceId={selectedAttendanceId || 0}
+        onClose={handleCloseImage}
+        isOpen={selectedAttendanceId !== null}
+      />
     </div>
   );
 
@@ -259,55 +251,20 @@ const AttendenceList = ({ className, testId = 'list-users' }: UserListProps): JS
       ? new Date(searchParams.startDate * 1000)
       : new Date();
 
-    const days = getDaysInMonth(currentDate);
-    const currentMonth = currentDate.getMonth();
-
     // Generate attendance map
     const attendanceMap = generateAttendanceMap(attendences || []);
 
-    return (
-      <div className="space-y-4">
-        <div className="text-xl font-semibold text-gray-900 text-center">
-          {format(currentDate, 'MMMM yyyy')}
-        </div>
-        <div className="grid grid-cols-7 gap-1">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-            <div key={day} className="p-2 text-center font-semibold text-gray-600">
-              {day}
-            </div>
-          ))}
-          {days.map((date, index) => {
-            const isCurrentMonth = date.getMonth() === currentMonth;
-            const dateString = date.toDateString();
-            const attendanceCount = attendanceMap.get(dateString) || 0;
+    const handleDateClick = (date: Date) => {
+      // Optional: Handle date click if needed
+      console.log('Date clicked:', date);
+    };
 
-            return (
-              <div
-                key={index}
-                className={classNames(
-                  'aspect-square p-2 border rounded-lg transition-colors',
-                  {
-                    [getBackgroundColor(attendanceCount)]: isCurrentMonth,
-                    'bg-gray-50 border-gray-100 text-gray-400': !isCurrentMonth
-                  }
-                )}
-              >
-                <div className={classNames(
-                  'font-medium',
-                  isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
-                )}>
-                  {date.getDate()}
-                </div>
-                {/* {isCurrentMonth && attendanceCount > 0 && (
-                  <div className="mt-1 text-xs text-gray-600">
-                    {attendanceCount} record{attendanceCount > 1 ? 's' : ''}
-                  </div>
-                )} */}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+    return (
+      <CalendarView
+        date={currentDate}
+        attendanceMap={attendanceMap}
+        onDateClick={handleDateClick}
+      />
     );
   };
 

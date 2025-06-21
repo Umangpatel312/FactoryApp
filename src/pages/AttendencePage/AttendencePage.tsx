@@ -24,7 +24,7 @@ const AttendencePage = (): JSX.Element => {
 
   const { setPageTitle } = usePage();
   useEffect(() => {
-    // This will be called once when the component mounts
+    // This wi  ll be called once when the component mounts
     setPageTitle("Attendence");
 
     // Optional cleanup function (not needed in this case)

@@ -48,10 +48,10 @@ export const useUpdateEmployee = () => {
     const data = response.data;
     console.log(data);
 
-    if (data.message) {
+    if (data.message === 'User updated successfully!') {
       return data.data;
     } else {
-      throw new Error('Authentication failed.');
+      throw new Error(data.message);
     }
   };
 

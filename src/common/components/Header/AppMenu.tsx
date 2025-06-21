@@ -1,11 +1,14 @@
 import { useAuth } from 'common/hooks/useAuth';
-import { useGetCurrentUser } from 'common/api/useGetUserRoles';
+import { useGetCurrentUser } from 'common/api/useGetCurrentUser';
 
 import logo from './logo.png';
 import SideMenu, { SideMenuProps } from 'common/components/Menu/SideMenu/SideMenu';
 import MenuNavLink from 'common/components/Menu/MenuNavLink';
 import Avatar from 'common/components/Icon/Avatar';
 import MenuSeparator from 'common/components/Menu/MenuSeparator';
+
+import { ROLES } from 'common/utils/role';
+import { useGetUseRoles } from 'common/api/useGetUseRoles';
 
 /**
  * Properties fro the `AppMenu` component.
@@ -19,9 +22,16 @@ interface AppMenuProps extends Omit<SideMenuProps, 'headerContent'> { }
  * @param {AppMenuProps} props - Component properties, `AppMenuProps`.
  * @returns {JSX.Element} JSX
  */
+
 const AppMenu = ({ side = 'right', testId = 'menu-app', ...props }: AppMenuProps): JSX.Element => {
   const { isAuthenticated } = useAuth();
   const { data: user } = useGetCurrentUser();
+
+  const { data: userRoles = [] } = useGetUseRoles();
+
+  const hasRole = (roles: string[]) => {
+    return roles.some(role => userRoles.includes(role));
+  };
 
   const renderHeader = () => {
     if (isAuthenticated && user) {
@@ -40,39 +50,58 @@ const AppMenu = ({ side = 'right', testId = 'menu-app', ...props }: AppMenuProps
     <SideMenu side={side} testId={testId} headerContent={renderHeader()} {...props}>
       {isAuthenticated ? (
         <>
+          <MenuNavLink to="/app" icon="puzzlePiece">
+            Dashboard
+          </MenuNavLink>
+
+          {/* Admin Menu Items */}
+          {hasRole([ROLES.ADMIN]) && (
+            <>
+              <MenuNavLink to="/app/admin/users" icon="users">
+                User Management
+              </MenuNavLink>
+              <MenuNavLink to="/app/admin/userAccess" title="Users" icon="universalAccess">
+                User Access
+              </MenuNavLink>
+            </>
+          )}
+
+          {/* Merchant Menu Items */}
+          {hasRole([ROLES.MERCHANT, ROLES.ADMIN]) && (
+            <>
+              <MenuNavLink to="/app/merchant/machines" icon="gears">
+                Machines
+              </MenuNavLink>
+              <MenuNavLink to="/app/merchant/employees" title="Users" icon="users">
+                Employees
+              </MenuNavLink>
+              <MenuNavLink to="/app/merchant/attendence" title="Users" icon="penToSquare">
+                Attendence
+              </MenuNavLink>
+              <MenuNavLink to="/app/merchant/salary" title="Salary" icon="handHoldingDollar">
+                Salary
+              </MenuNavLink>
+            </>
+          )}
+
+          {/* Employee Menu Items */}
+          {hasRole([ROLES.EMPLOYEE, ROLES.ADMIN]) && (
+            <>
+              <MenuNavLink to="/app/employee/attendence" icon="calendar">
+                Attendance
+              </MenuNavLink>
+              <MenuNavLink to="/app/employee/salary" title="Salary" icon="handHoldingDollar">
+                Salary
+              </MenuNavLink>
+            </>
+          )}
+
+          {/* Common Menu Items */}
+          {/* <MenuNavLink to="/app/profile" icon="user">
+            Profile
+          </MenuNavLink> */}
           <MenuNavLink to="/auth/signout" title="Sign Out" icon="rightFromBracket">
             Sign Out
-          </MenuNavLink>
-          <MenuSeparator />
-          {/* <MenuNavLink to="/app/settings" title="Settings" icon="sliders">
-            Settings
-          </MenuNavLink>
-          <MenuNavLink to="/app/components" title="Components" icon="puzzlePiece">
-            Components
-          </MenuNavLink>
-          <MenuNavLink to="/app/users" title="Users" icon="users">
-            Users
-          </MenuNavLink> */}
-          <MenuNavLink to="/app/machines" title="Users" icon="gears">
-            Machines
-          </MenuNavLink>
-          <MenuNavLink to="/app/employees" title="Users" icon="users">
-            Employees
-          </MenuNavLink>
-          <MenuNavLink to="/app/attendence" title="Users" icon="penToSquare">
-            Attendence
-          </MenuNavLink>
-          <MenuNavLink to="/app/salary" title="Salary" icon="handHoldingDollar">
-            Salary
-          </MenuNavLink>
-          <MenuNavLink to="/app/billing" title="Users" icon="moneyBill">
-            Billing
-          </MenuNavLink>
-          <MenuNavLink to="/app/admin/userAccess" title="Users" icon="universalAccess">
-            User Access
-          </MenuNavLink>
-          <MenuNavLink to="/app/admin/paymentHistory" title="Users" icon="fileInvoice">
-            Payment History
           </MenuNavLink>
         </>
       ) : (
@@ -83,10 +112,8 @@ const AppMenu = ({ side = 'right', testId = 'menu-app', ...props }: AppMenuProps
           <MenuNavLink to="/auth/signin" title="Sign Up" className="text-xs">
             Need an account? Sign Up
           </MenuNavLink>
-          <MenuSeparator />
-          <MenuNavLink to="/app/components" title="Components" icon="puzzlePiece">
-            Components
-          </MenuNavLink>
+          {/* <MenuSeparator /> */}
+      
         </>
       )}
     </SideMenu>

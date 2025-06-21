@@ -6,6 +6,7 @@ import { Machine } from 'common/api/useGetMachine';
 import { QRCodeCanvas } from "qrcode.react";
 import FAIcon from 'common/components/Icon/FAIcon';
 import Badge from 'common/components/Badge/Badge';
+import { useConfig } from 'common/hooks/useConfig';
 
 
 /**
@@ -38,6 +39,8 @@ const MachineListItem = ({
 }: MachineListItemProps): JSX.Element => {
   const navigate = useNavigate();
 
+  const config = useConfig();
+  
   const doClick = () => {
     navigate(`edit/${machine.id}`);
   };
@@ -47,10 +50,41 @@ const MachineListItem = ({
     const canvas = document.getElementById(`qr-code-${qrId}`) as HTMLCanvasElement;
     if (!canvas) return;
 
-    const pngUrl = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+    // Create a new canvas with better resolution and padding
+    const tempCanvas = document.createElement('canvas');
+    const ctx = tempCanvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas size with padding (original size * 2 for better resolution)
+    const padding = 20;
+    const qrSize = canvas.width * 2;
+    const textHeight = 30;
+    tempCanvas.width = qrSize + padding * 2;
+    tempCanvas.height = qrSize + textHeight + padding * 2;
+
+    // Draw background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+    // Draw QR code with padding
+    ctx.drawImage(canvas, padding, padding, qrSize, qrSize);
+
+    // Add machine name below QR code with better styling
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#333333';
+    ctx.textAlign = 'center';
+    ctx.fillText(machine.name, tempCanvas.width / 2, qrSize + padding + textHeight - 5);
+
+    // Convert to data URL and download
+    const pngUrl = tempCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
     const downloadLink = document.createElement('a');
     downloadLink.href = pngUrl;
-    downloadLink.download = `myqr-${qrId}.png`;
+    
+    // Format filename with machine name and timestamp
+    const timestamp = new Date().toISOString().split('T')[0];
+    const sanitizedMachineName = machine.name.replace(/[^a-zA-Z0-9]/g, '_');
+    downloadLink.download = `${sanitizedMachineName}_${timestamp}.png`;
+    
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
@@ -70,7 +104,7 @@ const MachineListItem = ({
       <div className='flex justify-between gap-x-6 py-5'>
         <div className="flex min-w-0 gap-x-4">
           <div className="bg-white shadow-md rounded size-12 flex-none">
-            <QRCodeCanvas id={`qr-code-${machine.id}`} value={`https://google.com/${machine.id}`} size={50} />
+            <QRCodeCanvas id={`qr-code-${machine.id}`} value={`${config.VITE_BASE_SERVER_URL_API}/employee/attendenceForm?machineId=${machine.id}`} size={50} />
           </div>
           <div className="min-w-0 flex-auto">
             <div className="truncate">{machine.name}</div>

@@ -110,7 +110,7 @@ const SigninForm = ({ className, testId = 'form-signin' }: SigninFormProps): JSX
               disabled={isSubmitting}
               testId={`${testId}-text-field-password`}
             />
-            <div className='flex'>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4">
               <Button
                 type="submit"
                 className="w-full sm:w-40"
@@ -119,9 +119,28 @@ const SigninForm = ({ className, testId = 'form-signin' }: SigninFormProps): JSX
               >
                 Sign In
               </Button>
-              <Text className='mt-2'>Dont have an account yet?
-                <NavLink to="/auth/signup" className="ml-2 text-blue-500 decoration-blue-500 underline hover:text-blue-700 hover:decoration-blue-700">Sign Up</NavLink>
-              </Text>
+              
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 text-sm sm:text-base">
+                <Text className="text-center sm:text-left">
+                  Don't have an account?{" "}
+                  <NavLink 
+                    to="/auth/signup" 
+                    className="text-blue-500 hover:text-blue-700 underline decoration-blue-500 hover:decoration-blue-700"
+                  >
+                    Sign Up
+                  </NavLink>
+                </Text>
+
+                <Text className="text-center sm:text-left">
+                  Forgot Password?{" "}
+                  <NavLink 
+                    to="/auth/verify" 
+                    className="text-blue-500 hover:text-blue-700 underline decoration-blue-500 hover:decoration-blue-700"
+                  >
+                    Reset
+                  </NavLink>
+                </Text>
+              </div>
             </div>
 
           </Form>

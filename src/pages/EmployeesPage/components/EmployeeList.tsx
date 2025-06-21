@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import { useGetEmployees } from '../api/useGetEmployees';
 import EmployeeListItem from './EmployeeListItem';
 import LoaderSkeleton from 'common/components/Loader/LoaderSkeleton';
-import { useGetCurrentUser } from 'common/api/useGetUserRoles';
+import { useGetCurrentUser } from 'common/api/useGetCurrentUser';
 
 /**
  * Properties for the `UserList` component.

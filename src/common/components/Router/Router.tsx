@@ -1,4 +1,5 @@
 import { Navigate, RouteObject, createBrowserRouter } from 'react-router-dom';
+import { ROLES } from 'common/utils/role';
 
 import StandardLayout from 'common/components/Layout/StandardLayout';
 import ErrorPage from 'pages/ErrorPage/ErrorPage';
@@ -7,18 +8,7 @@ import LandingPage from 'pages/LandingPage/LandingPage';
 import SigninPage from 'pages/SigninPage/SigninPage';
 import SignoutPage from 'pages/SignoutPage/SignoutPage';
 import DashboardPage from 'pages/DashboardPage/DashboardPage';
-import SettingsPage from 'pages/SettingsPage/SettingsPage';
-import AppearanceSettings from 'pages/SettingsPage/components/AppearanceSettings';
-import ComponentsPage from 'pages/ComponentsPage/ComponentsPage';
-import AvatarComponents from 'pages/ComponentsPage/components/AvatarComponents';
-import TextComponents from 'pages/ComponentsPage/components/TextComponents';
-import ButtonComponents from 'pages/ComponentsPage/components/ButtonComponents';
-import BadgeComponents from 'pages/ComponentsPage/components/BadgeComponents';
-import CardComponents from 'pages/ComponentsPage/components/CardComponents';
-import UsersPage from 'pages/UsersPage/UsersPage';
-import UserDetailLayout from 'pages/UsersPage/components/UserDetailLayout';
 import UserDetail from 'pages/UsersPage/components/UserDetail';
-import UserDetailEmpty from 'pages/UsersPage/components/UserDetailEmpty';
 import SalaryPage from 'pages/SalaryPage/SalaryPage';
 import UserTaskList from 'pages/UsersPage/components/UserTaskList';
 import TaskDetail from 'pages/UsersPage/Tasks/components/TaskDetail';
@@ -34,6 +24,11 @@ import AttendencePage from 'pages/AttendencePage/AttendencePage';
 import AttendenceDetailEmpty from 'pages/AttendencePage/components/AttendenceDetailEmpty';
 import AttendenceForm from 'pages/AttendencePage/components/AttendenceForm';
 import EmployeeAttendenceForm from 'pages/AttendencePage/components/EmployeeAttendenceForm';
+import UsersPage from 'pages/UsersPage/UsersPage';
+import UserDetailEmpty from 'pages/UsersPage/components/UserDetailEmpty';
+import UserDetailLayout from 'pages/EmployeesPage/components/UserDetailLayout';
+import UserVerifyPage from 'pages/SigninPage/UserVerifyPage';
+import ChangePasswordPage from 'pages/ChangePasswordPage/ChangePasswordPage';
 
 /**
  * The React Router configuration. An array of `RouteObject`.
@@ -58,190 +53,139 @@ export const routes: RouteObject[] = [
         element: <SignupPage />,
       },
       {
+        path: 'auth/verify',
+        element: <UserVerifyPage />,
+      },
+      {
         path: 'auth/signout',
         element: <SignoutPage />,
       },
+      // App routes - require authentication
       {
         path: 'app',
         element: <PrivateOutlet />,
         children: [
+          // Dashboard - accessible by all authenticated users
           { index: true, element: <DashboardPage /> },
+          // change-password
           {
-            path: 'settings',
-            element: <SettingsPage />,
-            children: [
-              {
-                index: true,
-                element: <Navigate to="appearance" />,
-              },
-              {
-                path: 'appearance',
-                element: <AppearanceSettings />,
-              },
-            ],
+            path: 'change-password',
+            element: <ChangePasswordPage />,
           },
+          // Admin only routes
           {
-            path: 'components',
-            element: <ComponentsPage />,
+            path: 'admin',
+            element: <PrivateOutlet allowedRoles={[ROLES.ADMIN]} />,
             children: [
               {
-                index: true,
-                element: <Navigate to="avatar" />,
-              },
-              {
-                path: 'avatar',
-                element: <AvatarComponents />,
-              },
-              {
-                path: 'badge',
-                element: <BadgeComponents />,
-              },
-              {
-                path: 'button',
-                element: <ButtonComponents />,
-              },
-              {
-                path: 'card',
-                element: <CardComponents />,
-              },
-              {
-                path: 'text',
-                element: <TextComponents />,
-              },
-            ],
-          },
-          {
-            path: 'users',
-            element: <UsersPage />,
-            children: [
-              {
-                index: true,
-                element: <UserDetailEmpty />,
-              },
-              {
-                path: ':userId',
-                element: <UserDetailLayout />,
+                path: 'users',
+                element: <UsersPage />,
                 children: [
-                  { index: true, element: <UserDetail /> },
+                  { index: true, element: <UserDetailEmpty /> },
                   {
-                    path: 'tasks',
-                    element: <UserTaskList />,
-                  },
-                  {
-                    path: 'tasks/:taskId',
-                    element: <TaskDetail />,
+                    path: ':userId',
+                    element: <UserDetailLayout />,
+                    children: [
+                      { index: true, element: <UserDetail /> },
+                      // ... other user sub-routes
+                    ],
                   },
                 ],
               },
             ],
           },
+
+          // Merchant routes
           {
-            path: 'machines',
-            element: <MachinesPage />,
+            path: 'merchant',
+            element: <PrivateOutlet allowedRoles={[ROLES.MERCHANT, ROLES.ADMIN]} />,
             children: [
               {
-                index: true,
-                element: <MachineDetailEmpty />,
+                path: 'machines',
+                element: <MachinesPage />,
+                children: [
+                  { index: true, element: <MachineDetailEmpty /> },
+                  {
+                    path: 'create',
+                    element: <MachineForm />
+                  },
+                  {
+                    path: 'edit/:machineId',
+                    element: <MachineForm />
+                  }
+                ],
+              },
+              // ... other merchant routes
+              {
+                path: 'salary',
+                element: <SalaryPage />,
               },
               {
-                path: ':machineId',
-                element: <MachineDetailLayout />,
+                path: 'employees',
+                element: <EmployeesPage />,
                 children: [
-                  { index: true, element: <UserDetail /> },
                   {
-                    path: 'tasks',
-                    element: <UserTaskList />,
+                    index: true,
+                    element: <EmployeeDetailEmpty />,
                   },
                   {
-                    path: 'tasks/:taskId',
-                    element: <TaskDetail />,
+                    path: 'create',
+                    element: <EmployeeRegisterPage />
                   },
+                  {
+                    path: 'edit/:employeeId',
+                    element: <EmployeeRegisterPage />
+                  }
                 ],
               },
               {
-                path: 'create',
-                element: <MachineForm />
-              },
-              {
-                path: 'edit/:machineId',
-                element: <MachineForm />
+                path: 'attendence',
+                element: <AttendencePage />,
+                children: [
+                  {
+                    index: true,
+                    element: <AttendenceDetailEmpty />,
+                  },
+                  {
+                    path: 'create',
+                    element: <AttendenceForm />
+                  },
+                  {
+                    path: 'edit/:employeeId',
+                    element: <EmployeeRegisterPage />
+                  }
+                ],
               }
             ],
           },
+
+          // Employee routes
           {
-            path: 'salary',
-            element: <SalaryPage />,
-          },
-          {
-            path: 'employees',
-            element: <EmployeesPage />,
+            path: 'employee',
+            element: <PrivateOutlet allowedRoles={[ROLES.EMPLOYEE, ROLES.ADMIN]} />,
             children: [
               {
-                index: true,
-                element: <EmployeeDetailEmpty />,
+                path: 'attendence',
+                element: <AttendencePage />,
+                // ... attendance sub-routes
+              },
+              // ... other employee routes
+              {
+                path: 'salary',
+                element: <SalaryPage />,
               },
               {
-                path: ':machineId',
-                element: <MachineDetailLayout />,
-                children: [
-                  { index: true, element: <UserDetail /> },
-                  {
-                    path: 'tasks',
-                    element: <UserTaskList />,
-                  },
-                  {
-                    path: 'tasks/:taskId',
-                    element: <TaskDetail />,
-                  },
-                ],
+                path: 'attendenceForm',
+                element: <EmployeeAttendenceForm />
               },
-              {
-                path: 'create',
-                element: <EmployeeRegisterPage />
-              },
-              {
-                path: 'edit/:employeeId',
-                element: <EmployeeRegisterPage />
-              }
             ],
           },
-          {
-            path: 'attendence',
-            element: <AttendencePage />,
-            children: [
-              {
-                index: true,
-                element: <AttendenceDetailEmpty />,
-              },
-              {
-                path: ':machineId',
-                element: <MachineDetailLayout />,
-                children: [
-                  { index: true, element: <UserDetail /> },
-                  {
-                    path: 'tasks',
-                    element: <UserTaskList />,
-                  },
-                  {
-                    path: 'tasks/:taskId',
-                    element: <TaskDetail />,
-                  },
-                ],
-              },
-              {
-                path: 'create',
-                element: <AttendenceForm />
-              },
-              {
-                path: 'edit/:employeeId',
-                element: <EmployeeRegisterPage />
-              }
-            ],
-          },
-          {
-            path: 'employee/attendendenceForm',
-            element: <EmployeeAttendenceForm />
-          },
+
+          // Shared routes for all authenticated users
+          // {
+          //   path: 'profile',
+          //   element: <ProfilePage />,
+          // },
         ],
       },
     ],

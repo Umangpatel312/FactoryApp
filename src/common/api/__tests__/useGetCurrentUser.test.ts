@@ -4,7 +4,7 @@ import { renderHook, waitFor } from 'test/test-utils';
 import { userFixture1 } from '__fixtures__/users';
 import storage from 'common/utils/storage';
 
-import { useGetCurrentUser } from 'common/api/useGetUserRoles';
+import { useGetCurrentUser } from 'common/api/useGetCurrentUser';
 
 describe('useGetCurrentUser', () => {
   const getItemSpy = vi.spyOn(storage, 'getItem');

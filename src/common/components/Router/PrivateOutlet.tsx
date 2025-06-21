@@ -1,45 +1,42 @@
+// src/common/components/Router/PrivateOutlet.tsx
 import { useAuth } from 'common/hooks/useAuth';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import LoaderSpinner from 'common/components/Loader/LoaderSpinner';
+import RoleBasedRoute from './RoleBasedRoute';
 
-/**
- * The `PrivateOutlet` determines if the user is authenticated. It is typically
- * used within the router configuration as the parent of hierarchy of routes
- * which require authentication.
- *
- * If authenticated, the element specified by the route is rendered.
- *
- * If not authenticated, the application navigates to the sign in page.
- * @returns {JSX.Element} JSX
- */
-const PrivateOutlet = (): JSX.Element => {
+interface PrivateOutletProps {
+  allowedRoles?: string[];
+}
+
+const PrivateOutlet = ({ allowedRoles }: PrivateOutletProps = {}): JSX.Element => {
   const authContext = useAuth();
-
-  if (authContext.isAuthenticated) {
-    return <Outlet />;
-  } else {
-    return <Navigate to="/auth/signin" />;
-  }
-};
-
-export default PrivateOutlet;
-
-/*
-
-// Mock authentication function (replace with your actual auth logic)
-const isAuthenticated = () => {
-  // For example, check if a token exists in localStorage or context
-  return localStorage.getItem('authToken') !== null;
-};
-
-const PrivateOutlet = () => {
   const location = useLocation();
-  
-  return isAuthenticated() ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/auth/signin" state={{ from: location }} replace />
+
+  // Show loading state while checking authentication
+  if (authContext.isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoaderSpinner />
+      </div>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!authContext.isAuthenticated) {
+    return <Navigate to="/auth/signin" state={{ from: location }} replace />;
+  }
+
+  // If no roles are required, just render the outlet
+  if (!allowedRoles || allowedRoles.length === 0) {
+    return <Outlet />;
+  }
+
+  // Otherwise, check roles using RoleBasedRoute
+  return (
+    <RoleBasedRoute allowedRoles={allowedRoles}>
+      <Outlet />
+    </RoleBasedRoute>
   );
 };
 
 export default PrivateOutlet;
-*/

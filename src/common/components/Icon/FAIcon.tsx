@@ -3,7 +3,7 @@ import { BaseComponentProps } from '@leanstacks/react-common';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { faCalendar, faCircle as faCircleRegular, faPenToSquare } from '@fortawesome/free-regular-svg-icons';
+import { faCalendar, faCircle as faCircleRegular, faImage, faPenToSquare } from '@fortawesome/free-regular-svg-icons';
 import {
   faBars,
   faBuilding,
@@ -72,6 +72,7 @@ export type FAIconName =
   | 'filter'
   | 'fileInvoice'
   | 'inbox'
+  | 'image'
   | 'gears'
   | 'language'
   | 'link'
@@ -134,6 +135,7 @@ const icons: Record<FAIconName, IconProp> = {
   filter: faFilter,
   fileInvoice: faFileInvoice,
   gears: faGears,
+  image: faImage,
   inbox: faInbox,
   language: faLanguage,
   link: faLink,

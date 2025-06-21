@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import find from 'lodash/find';
+import { AxiosError } from 'axios';
 
 import { User } from 'common/api/useGetUser';
 import { UserTokens } from 'common/api/useGetUserTokens';
@@ -10,6 +11,16 @@ import storage from 'common/utils/storage';
 import { QueryKeys, StorageKeys } from 'common/utils/constants';
 import { useUserRoles } from './useUserRole';
 import { getJwtClaims } from './getJwtClaims';
+
+type ApiErrorResponse = {
+  errorObject: Array<{
+    errorMsg: string;
+    uri: string;
+    status: string;
+  }>;
+};
+
+type ApiError = AxiosError<ApiErrorResponse>;
 
 /**
  * The `useDeleteTask` mutation function variables.
@@ -41,8 +52,6 @@ export const useSignin = () => {
   const axios = useAxios();
   const config = useConfig();
 
-  const { fetchAndCacheUserRoles } = useUserRoles();   // ✅ Use the hook
-
 
   /**
    * Attempts to authenticate a user.
@@ -52,28 +61,19 @@ export const useSignin = () => {
    */
 
   const signin = async (signInRequestPayload: SignInReqestPayload): Promise<User> => {
-    // REPLACE: This is a contrived "signin" approach for demonstration purposes.
-    //          You should implement authentication functionality in accordance
-    //          with your IdP.
+    try {
+      const response = await axios.request<SignInResponsePayload>({
+        url: `${config.VITE_BASE_URL_API}/auth/login`,
+        method: 'post',
+        data: signInRequestPayload,
+        validateStatus: (status) => status === 200 // Only consider 200 as success
+      });
+      
+      const data = response.data.data;
 
-    // fetch all users
-    // TODO: login api changes
-    const response = await axios.request<SignInResponsePayload>({
-      url: `${config.VITE_BASE_URL_API}/auth/login`,
-      method: 'post',
-      data: signInRequestPayload
-    });
-    console.log(response);
-    // if user matching 'username' is found, consider the user to be authenticated.
-    const data = response.data.data;
-    console.log(data.user);
-
-    if (data) {
       // store current user in localstorage
       storage.setItem(StorageKeys.User, JSON.stringify(data.user));
 
-      // simlate the creation of authentication tokens
-      // const expires_at = dayjs().add(1, 'hour').toISOString();
       const tokens: UserTokens = {
         access_token: data.token,
         id_token: data.token,
@@ -85,12 +85,24 @@ export const useSignin = () => {
       storage.setItem(StorageKeys.UserTokens, JSON.stringify(tokens));
 
       const decodedClaims = getJwtClaims(data.token);
-
       storage.setItem(StorageKeys.UserRoles, JSON.stringify(decodedClaims?.roles));
 
       return data.user;
-    } else {
-      throw new Error('Authentication failed.');
+    } catch (error) {
+      const axiosError = error as ApiError;
+      
+      if (axiosError.response?.status === 422 && axiosError.response.data?.errorObject?.length > 0) {
+        // Handle 422 validation errors
+        const errorMessage = axiosError.response.data.errorObject[0]?.errorMsg || 'Validation failed';
+        throw new Error(errorMessage);
+      }
+      
+      // Handle other types of errors
+      const errorMessage = axiosError.response?.status === 401 
+        ? 'Invalid credentials. Please check your username and password.'
+        : axiosError.message || 'An unexpected error occurred during sign in.';
+        
+      throw new Error(errorMessage);
     }
   };
 

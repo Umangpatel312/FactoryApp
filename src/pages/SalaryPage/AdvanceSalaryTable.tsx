@@ -11,7 +11,7 @@ import * as Yup from 'yup';
 import TextField from 'common/components/Form/TextField';
 import Button from 'common/components/Button/Button';
 import { ButtonVariant } from '@leanstacks/react-common';
-import { useGetCurrentUser } from 'common/api/useGetUserRoles';
+import { useGetCurrentUser } from 'common/api/useGetCurrentUser';
 import { useGetUseRoles } from 'common/api/useGetUseRoles';
 
 const initialValues = { employee: '', amount: '' };
@@ -36,8 +36,9 @@ const AdvanceSalaryTable: React.FC = () => {
     { accessorKey: 'advanceSalaryDate', header: 'Date', cell: info => {
         const val = info.getValue();
         if (!val) return '-';
-        const date = new Date(val as number);
-        return date.toLocaleDateString();
+        // Convert seconds to milliseconds by multiplying with 1000
+        const date = new Date(Number(val) * 1000);
+        return date.toLocaleDateString('en-GB'); // Use 'en-GB' for DD/MM/YYYY format
       }
     },
   ];
@@ -83,122 +84,153 @@ const AdvanceSalaryTable: React.FC = () => {
   // const [selectedEmployeeFilter, setSelectedEmployeeFilter] = useState('');
 
   return (
-    <div>
-      <div className="flex flex-col md:flex-row gap-4 mb-4 justify-between items-end w-full">
-        {/* Collapsible Add Advance Salary Form */}
-        <div className="w-full md:w-1/2">
-          {!showForm && (
-            <Button
-              type="button"
-              variant={ButtonVariant.Text}
-              className="mb-2 w-full sm:w-52 text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800"
-              onClick={() => setShowForm(true)}
-              testId="advance-toggle-form"
+    <div className="w-full">
+      {/* Filter Controls */}
+      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:items-end lg:justify-between">
+          <div className="w-full">
+            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="w-full">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Financial Year</label>
+                <SelectField
+                  name="financial-year"
+                  options={fys}
+                  value={selectedFY}
+                  onChange={val => {
+                    setSelectedFY(val);
+                    const months = getMonthsForFY(val);
+                    setSelectedMonth(months[0].value);
+                  }}
+                  className="w-full text-sm sm:text-base"
+                />
+              </div>
+              <div className="w-full">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Month</label>
+                <SelectField
+                  name="salary-month"
+                  options={fyMonths}
+                  value={selectedMonth}
+                  onChange={val => setSelectedMonth(val)}
+                  className="w-full text-sm sm:text-base"
+                />
+              </div>
+              <div className="w-full">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Employee</label>
+                <SelectField
+                  name="filter-employee"
+                  options={employeeOptions}
+                  value={selectedEmployeeFilter}
+                  onChange={val => setSelectedEmployeeFilter(val)}
+                  className="w-full text-sm sm:text-base"
+                />
+              </div>
+              <div className="w-full flex items-end">
+                {!showForm ? (
+                  <Button
+                    type="button"
+                    variant={ButtonVariant.Text}
+                    className="w-full text-white bg-green-600 hover:bg-green-700 text-sm h-10"
+                    onClick={() => setShowForm(true)}
+                    testId="advance-toggle-form"
+                  >
+                    Add Advance Salary
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Add Advance Salary Form */}
+        <div className={`transition-all duration-300 overflow-hidden mt-4 ${showForm ? 'max-h-[200px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}>
+          {showForm && (
+            <Formik
+              initialValues={initialValues}
+              validationSchema={validationSchema}
+              onSubmit={async (values, { resetForm }) => {
+                if (!user?.id) return;
+                saveAdvanceSalary({
+                  userId: Number(values.employee),
+                  advanceSalaryAmount: Number(values.amount),
+                  paidByUserId: user.id,
+                }, {
+                  onSuccess: () => {
+                    resetForm();
+                    setShowForm(false);
+                  }
+                });
+              }}
             >
-              Add Advance Salary
-            </Button>
-          )}
-          <div
-            className={`transition-all duration-300 overflow-hidden ${showForm ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}
-          >
-            {showForm && (
-              <Formik
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-                onSubmit={async (values, { resetForm }) => {
-                  if (!user?.id) return;
-                  saveAdvanceSalary({
-                    userId: Number(values.employee),
-                    advanceSalaryAmount: Number(values.amount),
-                    paidByUserId: user.id,
-                  }, {
-                    onSuccess: () => {
-                      resetForm();
-                      setShowForm(false);
-                    }
-                  });
-                }}
-              >
-                {({ values, handleChange, setFieldValue }) => (
-                  <Form className="flex gap-2 items-end mt-2 relative">
-                    <div className="flex flex-col w-1/2">
-                      <SelectField
-                        label="Employee"
-                        name="employee"
-                        options={employeeOptions}
-                        value={values.employee}
-                        onChange={val => setFieldValue('employee', val)}
-                        className="min-w-[160px]"
-                      />
-                    </div>
-                    <div className="flex flex-col w-1/2">
-                      <TextField
-                        label="Advance Amount"
-                        name="amount"
-                        value={values.amount}
-                        onChange={handleChange}
-                        className="min-w-[120px]"
-                        type="number"
-                      />
-                    </div>
+              {({ values, handleChange, setFieldValue }) => (
+                <Form className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end p-4 bg-gray-50 rounded-md">
+                  <div>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Employee</label>
+                    <SelectField
+                      name="employee"
+                      options={employeeOptions}
+                      value={values.employee}
+                      onChange={val => setFieldValue('employee', val)}
+                      className="w-full text-sm sm:text-base"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Advance Amount</label>
+                    <TextField
+                      name="amount"
+                      value={values.amount}
+                      onChange={handleChange}
+                      className="w-full text-sm sm:text-base"
+                      type="number"
+                    />
+                  </div>
+                  <div className="flex items-end gap-2 sm:col-span-2">
                     <Button
                       type="submit"
                       variant={ButtonVariant.Text}
                       disabled={saveAdvanceSalaryPending}
-                      className="bg-green-700 hover:bg-green-800 text-white"
+                      className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white text-sm h-10"
                     >
-                      {saveAdvanceSalaryPending ? 'Saving...' : 'Save'}
+                      {saveAdvanceSalaryPending ? 'Saving...' : 'Save Advance'}
                     </Button>
                     <Button
                       type="button"
                       variant={ButtonVariant.Text}
                       onClick={() => setShowForm(false)}
-                      className="ml-2 text-red-500"
+                      className="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm h-10"
                     >
-                      ×
+                      Cancel
                     </Button>
-                  </Form>
-                )}
-              </Formik>
-            )}
-          </div>
-        </div>
-        {/* Right: Filters */}
-        <div className="flex gap-4 w-full md:w-auto justify-end">
-          <SelectField
-            label="Financial Year"
-            name="financial-year"
-            options={fys}
-            value={selectedFY}
-            onChange={val => {
-              setSelectedFY(val);
-              const months = getMonthsForFY(val);
-              setSelectedMonth(months[0].value);
-            }}
-          />
-          <SelectField
-            label="Select Month"
-            name="salary-month"
-            options={fyMonths}
-            value={selectedMonth}
-            onChange={val => setSelectedMonth(val)}
-          />
-          <SelectField
-            label="Employee"
-            name="filter-employee"
-            options={employeeOptions}
-            value={selectedEmployeeFilter}
-            onChange={val => setSelectedEmployeeFilter(val)}
-            className="min-w-[160px]"
-          />
+                  </div>
+                </Form>
+              )}
+            </Formik>
+          )}
         </div>
       </div>
-      {/* Only show table if all filters are selected */}
-      {allFiltersSelected ? (
-        <Table columns={advanceSalaryColumns} data={filteredData} testId="advance-salary-table" />
-      ) : (
-        <div className="text-red-600 font-semibold p-6 text-center">Please select Financial Year, Month, and Employee to view advance salary data.</div>
-      )}
+      {/* Table Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        {isLoading ? (
+          <div className="flex justify-center items-center p-12">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+          </div>
+        ) : allFiltersSelected && filteredData.length > 0 ? (
+          <div className="overflow-x-auto">
+            <div className="min-w-[800px] md:min-w-0">
+              <Table 
+                columns={advanceSalaryColumns} 
+                data={filteredData} 
+                testId="advance-salary-table"
+                className="w-full border-0"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="p-12 text-center text-gray-500">
+            <p className="text-lg font-medium">No data available</p>
+            <p className="mt-1">Please select Financial Year, Month, and Employee to view advance salary data.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

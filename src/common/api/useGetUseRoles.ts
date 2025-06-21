@@ -1,15 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-
 import storage from 'common/utils/storage';
-import { User } from './useGetUser';
 import { QueryKeys, StorageKeys } from 'common/utils/constants';
 
 /**
- * An API hook which fetches the currently authenticated `User`.
- * @returns Returns a `UseQueryResult` with `User` data.
+ * An API hook which fetches the currently authenticated user's roles.
+ * @returns Returns a `UseQueryResult` with user roles data.
  */
 export const useGetUseRoles = () => {
-  const getCurrentUser = (): Promise<string[]> => {
+  const getCurrentUserRoles = (): Promise<string[]> => {
     return new Promise((resolve, reject) => {
       try {
         const storedUser = storage.getItem(StorageKeys.UserRoles);
@@ -17,7 +15,7 @@ export const useGetUseRoles = () => {
           const roles = JSON.parse(storedUser) as unknown as string[];
           return resolve(roles);
         }
-        return reject(new Error('Not found'));
+        return reject(new Error('No roles found'));
       } catch (err) {
         return reject(err);
       }
@@ -26,6 +24,8 @@ export const useGetUseRoles = () => {
 
   return useQuery({
     queryKey: [QueryKeys.UserRoles],
-    queryFn: getCurrentUser,
+    queryFn: getCurrentUserRoles,
+    gcTime: 0, // Disable garbage collection (replaces cacheTime)
+    staleTime: 0, // Always consider data as stale
   });
 };

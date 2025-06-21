@@ -31,7 +31,7 @@ const EmployeeDetailEmpty = ({
       <MessageCard
         className="mx-auto"
         iconProps={{ icon: 'circleInfo', size: '2x' }}
-        message="Select a machine from the list to edit details or Use add button"
+        message="Select a employee from the list to edit details or Use add button"
         testId={`${testId}-card-message`}
       />
       <div className='flex justify-center items-center'>

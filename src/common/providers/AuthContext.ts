@@ -8,6 +8,7 @@ import { UserTokens } from 'common/api/useGetUserTokens';
  */
 export interface AuthContextValue {
   isAuthenticated: boolean;
+  isLoading: boolean;
   userToken?: UserTokens;
   refetchUserTokens?: () => Promise<QueryObserverBaseResult<UserTokens, Error>>;
 }
@@ -17,6 +18,7 @@ export interface AuthContextValue {
  */
 const DEFAULT_CONTEXT_VALUE: AuthContextValue = {
   isAuthenticated: false,
+  isLoading: true,
 };
 
 /**

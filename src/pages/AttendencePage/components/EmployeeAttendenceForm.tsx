@@ -1,7 +1,7 @@
 import { FC, useEffect } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { Alert, AlertVariant, PropsWithClassName, PropsWithTestId } from '@leanstacks/react-common';
-import { useGetCurrentUser } from 'common/api/useGetUserRoles';
+import { useGetCurrentUser } from 'common/api/useGetCurrentUser';
 import AttendenceForm from './AttendenceForm';
 import { useGetUseRoles } from 'common/api/useGetUseRoles';
 import { usePage } from 'common/hooks/usePage';

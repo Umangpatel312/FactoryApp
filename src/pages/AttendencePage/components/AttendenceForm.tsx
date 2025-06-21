@@ -11,7 +11,7 @@ import LoaderSkeleton from 'common/components/Loader/LoaderSkeleton';
 import { useCreateAttendence } from '../api/useCreateAttendence';
 import SelectField from 'common/components/Form/SelectField';
 import { useGetEmployees } from 'pages/EmployeesPage/api/useGetEmployees';
-import { useGetCurrentUser } from 'common/api/useGetUserRoles';
+import { useGetCurrentUser } from 'common/api/useGetCurrentUser';
 import { useGetMachines } from 'pages/MachinesPage/api/useGetMachines';
 import { useGetMachine } from 'common/api/useGetMachine';
 
@@ -22,9 +22,9 @@ interface AttendenceFormProps extends PropsWithClassName, PropsWithTestId {
 
 export type Attendance = {
   id?: number | undefined;
-  attendanceDate: number;
+  attendanceDate: string;
   production: number;
-  frame: number;
+  frames: number;
   dhaga: number;
   userId: number;
   userName?: string;
@@ -40,9 +40,9 @@ const validationSchema = object<Attendance>({
   userId: number()
     .required('Please select an employee')
     .min(1, 'Please select an employee'),
-  attendanceDate: number().required('Required.'),
+  attendanceDate: string().required('Required.'),
   production: number().required('Required.').min(0, 'Must be greater than or equal to 0'),
-  frame: number().required('Required.').min(0, 'Must be greater than or equal to 0'),
+  frames: number().required('Required.').min(0, 'Must be greater than or equal to 0'),
   dhaga: number().required('Required.').min(0, 'Must be greater than or equal to 0'),
   shiftId: number().required('Required.'),
   salaryTypeId: number().required('Required.'),
@@ -57,9 +57,9 @@ const AttendenceForm = ({ className, testId = 'form-attendance', machineId, empl
   const { data: user } = useGetCurrentUser();
 
   const initialValues: Attendance = {
-    attendanceDate: Math.floor(Date.now() / 1000),
+    attendanceDate: new Date().toISOString().split('T')[0],
     production: 0,
-    frame: 0,
+    frames: 0,
     dhaga: 0,
     userId: employeeId || 0,
     shiftId: 0,
@@ -70,10 +70,22 @@ const AttendenceForm = ({ className, testId = 'form-attendance', machineId, empl
 
   const handleSubmit = (values: Attendance, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
     setError('');
+    
+    if (!selectedFile) {
+      setError('Please select an image before submitting');
+      setSubmitting(false);
+      return;
+    }
+    
+    const submissionValues = {
+      ...values,
+      attendanceDate: new Date(values.attendanceDate).getTime() / 1000
+    };
+    
     createAttendence(
       {
-        attendence: values,
-        file: selectedFile || undefined
+        attendence: submissionValues,
+        file: selectedFile
       },
       {
         onSuccess: () => {
@@ -275,9 +287,12 @@ const AttendenceForm = ({ className, testId = 'form-attendance', machineId, empl
                 type="date"
                 name="attendanceDate"
                 label="Attendance Date"
-                value={new Date().toISOString().split('T')[0]} // Format: YYYY-MM-DD
+                value={values.attendanceDate || ''}
+                onChange={(e) => {
+                  setFieldValue('attendanceDate', e.target.value);
+                }}
                 autoComplete="off"
-                disabled={true} // Always disabled
+                max={new Date().toISOString().split('T')[0]} // Prevent future dates
                 testId={`${testId}-text-field-date`}
                 className="w-full"
               />
@@ -305,7 +320,7 @@ const AttendenceForm = ({ className, testId = 'form-attendance', machineId, empl
               />
               <TextField
                 type="number"
-                name="frame"
+                name="frames"
                 label="Frame"
                 autoComplete="off"
                 disabled={isSubmitting}
@@ -324,6 +339,13 @@ const AttendenceForm = ({ className, testId = 'form-attendance', machineId, empl
 
               {/* Replace the old file input with the new camera capture component */}
               {renderImageCapture()}
+              
+              {/* File selection error message */}
+              {error && !selectedFile && (
+                <div className="mt-2 text-red-600 text-sm">
+                  {error}
+                </div>
+              )}
             </div>
 
             {/* Buttons at the bottom */}

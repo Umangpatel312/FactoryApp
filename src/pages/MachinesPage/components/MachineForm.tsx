@@ -103,6 +103,7 @@ const MachineForm = ({ className, testId = 'form-signin' }: MachineFormProps): J
       ) :
         (
           <Formik<Machine>
+            key={`machine-form-${machineId}`}
             initialValues={machine ? machine : { id: 0, name: '', heads: undefined, area: undefined, isActive: true }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
